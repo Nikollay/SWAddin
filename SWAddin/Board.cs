@@ -15,33 +15,34 @@ namespace SWAddin
         public List<Circle> circles;
         //public List<Point> point;
         public List<Object> sketh, cutout;
-
         public double thickness;
-       
+        public int ver;
+
         public static Board GetfromXML(string filename)
-        { 
-            XDocument doc=GetXML(filename);
+        {
+            Board board = new Board();
+            XDocument doc=GetXML(filename, board);
             if (doc == null) { return null; }
             IEnumerable<XElement> elements = doc.Root.Elements();
-            Board board = new Board();
             board.components = new List<Component>();
             foreach (XElement e in elements)
             {
                 if (e.FirstAttribute.Name == "AD_ID") { GetBodyfromXElement(e, board); }
                 if (e.FirstAttribute.Name == "ID") { board.components.Add(GetfromXElement(e)); }
             }
-            doc.Save("D:\\Домашняя работа\\test.xml");
             return board;
         }
-        private static XDocument GetXML(string filename)
+        private static XDocument GetXML(string filename, Board board)
         {
             XDocument doc = XDocument.Load(filename);
             XElement element = (XElement)doc.Root.FirstNode;
             switch (element.Name.ToString())
             {
                 case "transactions":
-                    return GetXML1(filename);
+                    board.ver = 1;
+                    return GetXML1(filename);   
                 case "transaction":
+                    board.ver = 2;
                     return GetXML2(filename);
                 default:
                     return null;

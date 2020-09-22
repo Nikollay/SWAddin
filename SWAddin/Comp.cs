@@ -81,7 +81,7 @@ namespace SWAddin
                 confManager = (ConfigurationManager)swModel.ConfigurationManager;
                 configuration = confManager.ActiveConfiguration.Name;
                 prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
-                prpMgr.Get4("Обозначение", true, out string valOut, out _);
+                prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
                 component.used = valOut;
 
                 comp = (Component2)comps[i];
@@ -105,22 +105,22 @@ namespace SWAddin
                     swModelDocExt = (ModelDocExtension)compDoc.Extension;
                     prpMgr = (CustomPropertyManager)swModelDocExt.get_CustomPropertyManager(configuration);
 
-                    prpMgr.Get4("Формат", true, out valOut, out _);
+                    prpMgr.Get6("Формат", true, out valOut, out _, out _, out _);
                     component.format = valOut;
-                    prpMgr.Get4("Обозначение", true, out valOut, out _);
+                    prpMgr.Get6("Обозначение", true, out valOut, out _, out _, out _);
                     component.designation = valOut;
-                    prpMgr.Get4("Наименование", true, out valOut, out _);
+                    prpMgr.Get6("Наименование", true, out valOut, out _, out _, out _);
                     component.name = valOut;
-                    prpMgr.Get4("Примечание", true, out valOut, out _);
+                    prpMgr.Get6("Примечание", true, out valOut, out _, out _, out _);
                     component.note = valOut;
-                    prpMgr.Get4("Раздел", true, out valOut, out _);
+                    prpMgr.Get6("Раздел", true, out valOut, out _, out _, out _);
                     component.chapter = valOut;
-                    prpMgr.Get4("Перв.Примен.", true, out valOut, out _);
+                    prpMgr.Get6("Перв.Примен.", true, out valOut, out _, out _, out _);
                     component.included = valOut;
 
                     if ((component.chapter == "Стандартные изделия") | (component.chapter == "Прочие изделия"))
                     {
-                        prpMgr.Get4("Документ на поставку", true, out valOut, out _);
+                        prpMgr.Get6("Документ на поставку", true, out valOut, out _, out _, out _);
                         component.doc = valOut;
                         component.type = component.name.Substring(0, component.name.IndexOf((char)32));
                     }
@@ -248,23 +248,23 @@ namespace SWAddin
             configuration = confManager.ActiveConfiguration.Name;
             swModelDocExt = swModel.Extension;
             prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
-            prpMgr.Get4("п_Утв", true, out string valOut, out _);
+            prpMgr.Get6("п_Утв", true, out string valOut, out _, out _, out _);
             approved = valOut;
-            prpMgr.Get4("п_Разраб", true, out valOut, out _);
+            prpMgr.Get6("п_Разраб", true, out valOut, out _, out _, out _);
             developed = valOut;
-            prpMgr.Get4("Проект", true, out valOut, out _);
+            prpMgr.Get6("Проект", true, out valOut, out _, out _, out _);
             project = valOut;
-            prpMgr.Get4("п_Пров", true, out valOut, out _);
+            prpMgr.Get6("п_Пров", true, out valOut, out _, out _, out _);
             verified = valOut;
-            prpMgr.Get4("Примечание", true, out valOut, out _);
+            prpMgr.Get6("Примечание", true, out valOut, out _, out _, out _);
             note = valOut;
-            prpMgr.Get4("Перв. примен.", true, out valOut, out _);
+            prpMgr.Get6("Перв. примен.", true, out valOut, out _, out _, out _);
             included = valOut;
-            prpMgr.Get4("Обозначение", true, out valOut, out _);
+            prpMgr.Get6("Обозначение", true, out valOut, out _, out _, out _);
             designation = valOut;
-            prpMgr.Get4("Наименование", true, out valOut, out _);
+            prpMgr.Get6("Наименование", true, out valOut, out _, out _, out _);
             title = valOut;
-            prpMgr.Get4("п_Н_контр", true, out valOut, out _);
+            prpMgr.Get6("п_Н_контр", true, out valOut, out _, out _, out _);
             normal_inspection = valOut;
 
             name[0] = new XAttribute("name", "Шифр PCB");

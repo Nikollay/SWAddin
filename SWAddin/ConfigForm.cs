@@ -20,7 +20,7 @@ namespace SWAddin
             {
                 button = new CheckBox();
                 Controls.Add(button);
-                this.Height = 150;
+                this.Height = 175;
                 Ok.Top = 80;
                 Controls.Add(button);
                 button.Width = 200;

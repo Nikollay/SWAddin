@@ -30,6 +30,7 @@ namespace SWAddin
         public const int mainItemID1 = 1;
         public const int mainItemID2 = 2;
         public const int mainItemID3 = 3;
+        string sAddinName = "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS PDM\\PDMSW.dll";
         #endregion
 
         #region SolidWorks Registration
@@ -219,6 +220,7 @@ namespace SWAddin
 
         public void Create3DPCB()
         {
+            iSwApp.CommandInProgress = true;
             Board board;
             string filename;
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _); //Board.GetFilename();
@@ -229,6 +231,8 @@ namespace SWAddin
             AssemblyDoc swAssy;
             ModelView activeModelView;
 
+            iSwApp.UnloadAddIn(sAddinName);
+            
             //Новая сборка платы
             double swSheetWidth = 0, swSheetHeight = 0;
             string boardName;
@@ -275,6 +279,20 @@ namespace SWAddin
             swModel.FeatureManager.FeatureExtrusion3(true, false, false, 0, 0, board.thickness, board.thickness, false, false, false, false, 0, 0, false, false, false, false, true, true, true, 0, 0, false);
             swModel.ClearSelection2(true);
 
+            if (board.cutout.Count>2)
+            {
+                plane.Select2(false, -1);
+                swModel.SketchManager.InsertSketch(false);
+                swModel.SketchManager.AddToDB = true;
+                foreach (Object skt in board.cutout)
+                {
+                    if (skt.GetType().FullName == "SWAddin.Line") { Line sk = (Line)skt; swModel.SketchManager.CreateLine(sk.x1, sk.y1, 0, sk.x2, sk.y2, 0); }
+                    if (skt.GetType().FullName == "SWAddin.Arc") { Arc sk = (Arc)skt; swModel.SketchManager.CreateArc(sk.xc, sk.yc, 0, sk.x1, sk.y1, 0, sk.x2, sk.y2, 0, sk.direction); }
+                }
+                swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
+            }
+
+
             plane.Select2(false, -1);
             swModel.SketchManager.InsertSketch(false);
             swModel.SketchManager.AddToDB = true;
@@ -284,22 +302,34 @@ namespace SWAddin
             {
                 swModel.SketchManager.CreateCircleByRadius(c.xc, c.yc, 0, c.radius);
             }
-            swModel.FeatureManager.FeatureCut3(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false);
+            swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
+            //swModel.FeatureManager.FeatureCut3(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false);
 
             swAssy.HideComponent();
             swAssy.ShowComponent();
             swModel.ClearSelection2(true);
             swAssy.EditAssembly();
 
-            string path;
-            path = "D:\\PDM\\Прочие изделия\\ЭРИ";
-            List<string> allFoundFiles = new List<string>(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
+            string path, sample;
+            switch (board.ver)
+            {
+                case 1:
+                    path = "D:\\PDM\\Прочие изделия\\ЭРИ";
+                    break;
+                case 2:
+                    path = "D:\\PDM\\Прочие изделия\\Footprint";
+                    break;
+                default:
+                    path = "D:\\PDM\\Прочие изделия\\ЭРИ";
+                    break;
+            }
+            List<string> allFoundFiles = new List<string>(Directory.GetFiles(path, "*.SLD*", SearchOption.AllDirectories));
             Dictionary<string, string> empty = new Dictionary<string, string>();
-
-            string sample;
+                        
             foreach (Component comp in board.components)
             {
                 sample = comp.title;
+                if (board.ver==2) { sample = comp.footprint; }
                 comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
                 if (String.IsNullOrWhiteSpace(comp.fileName))
                 {
@@ -399,6 +429,9 @@ namespace SWAddin
             }
 
             string estr = "";
+            
+            iSwApp.LoadAddIn(sAddinName);
+
             if (empty.Count != 0)
             {
                 foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Value + System.Environment.NewLine; }
@@ -410,6 +443,7 @@ namespace SWAddin
         }
         public void GetXML()
         {
+            iSwApp.CommandInProgress = true;
             ModelDoc2 swModel;
             AssemblyDoc swAssy;
             List<Comp> coll;
@@ -422,15 +456,21 @@ namespace SWAddin
             string path;
             List<string> conf;
             string[] сonfNames;
-
-            fileName = iSwApp.GetOpenFileName("Выберите сборку", "", "SLDASM Files (*.SLDASM)|*.SLDASM|", out _, out _, out _);
-            //Проверяем путь
-            if (fileName == "")
+            swModel = (ModelDoc2)iSwApp.ActiveDoc;
+            if (swModel == null)
             {
-                return;
+                fileName = iSwApp.GetOpenFileName("Выберите сборку", "", "SLDASM Files (*.SLDASM)|*.SLDASM|", out _, out _, out _);
+                //Проверяем путь
+                if (fileName == "")
+                {
+                    return;
+                }
+                swModel = (ModelDoc2)iSwApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
             }
-            swModel = (ModelDoc2)iSwApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
 
+            iSwApp.UnloadAddIn(sAddinName);
+            
+            fileName = swModel.GetPathName();
             //Проверяем открыта сборка или нет
             if ((swModel.GetType() != 2) | (swModel == null))
             {
@@ -479,11 +519,14 @@ namespace SWAddin
             xml.Add(transaction);
             doc.Add(xml);
             path = fileName.Substring(0, fileName.Length - 7) + ".xml";
+            iSwApp.LoadAddIn(sAddinName);
             doc.Save(path);
-
+            
         }
         public void GetTiff()
         {
+            //object obt= iSwApp.GetAddInObject("ConisioSW2.ConisioSWAddIn") as SwAddin;
+            iSwApp.CommandInProgress = true;
             ModelDoc2 swModel;
             ModelDocExtension swModelDocExt;
             AssemblyDoc swAssy;
@@ -498,15 +541,19 @@ namespace SWAddin
             string[] сonfNames;
             object[] Comps;
 
-            fileName = iSwApp.GetOpenFileName("File to SLDASM", "", "SLDASM Files (*.SLDASM)|*.SLDASM|", out _, out _, out _);
-            //Проверяем путь
-            if (fileName == "")
+            swModel = (ModelDoc2)iSwApp.ActiveDoc;
+            if (swModel == null)
             {
-                
-                return;
-            }
-            swModel = (ModelDoc2)iSwApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
+                fileName = iSwApp.GetOpenFileName("File to SLDASM", "", "SLDASM Files (*.SLDASM)|*.SLDASM|", out _, out _, out _);
+                //Проверяем путь
+                if (fileName == "")
+                {
 
+                    return;
+                }
+                swModel = (ModelDoc2)iSwApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
+            }
+            iSwApp.UnloadAddIn(sAddinName);
             //Проверяем открыта сборка или нет
             if ((swModel.GetType() != 2) | (swModel == null))
             {
@@ -576,6 +623,7 @@ namespace SWAddin
 
             //Сохраняем картинки
             int itogo = 0;
+
             foreach (KeyValuePair<string, string> k in Drw)
             {
                 //Настройка размеров картинки
@@ -583,17 +631,18 @@ namespace SWAddin
                 iSwApp.SetUserPreferenceDoubleValue((int)swUserPreferenceDoubleValue_e.swTiffPrintDrawingPaperWidth, Width); //Double value in meters
                 iSwApp.SetUserPreferenceDoubleValue((int)swUserPreferenceDoubleValue_e.swTiffPrintDrawingPaperHeight, Height); //Double value in meters
 
-                Part = (DrawingDoc)iSwApp.OpenDoc6(k.Value + ".SLDDRW", (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_ReadOnly, "", ref errors, ref warnings);
+                Part = (DrawingDoc)iSwApp.OpenDoc6(k.Value + ".SLDDRW", (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_ViewOnly, "", ref errors, ref warnings);
                 if ((errors == 0) & (Part != null))
                 {
                     swModel = (ModelDoc2)Part;
                     swModelDocExt = (ModelDocExtension)swModel.Extension;
-                    swModelDocExt.SaveAs(projekt_path + "TIF\\" + k.Key + ".TIF", 0, (int)swSaveAsOptions_e.swSaveAsOptions_Silent, null, ref errors, ref warnings);
+                    swModelDocExt.SaveAs2(projekt_path + "TIF\\" + k.Key + ".TIF", (int)swSaveAsVersion_e.swSaveAsCurrentVersion, (int)swSaveAsOptions_e.swSaveAsOptions_Silent,  null, "", false, ref errors, ref warnings);
                     itogo += 1;
                 }
                 iSwApp.CloseDoc(k.Value + ".SLDDRW");
                 Part = null;
             }
+            iSwApp.LoadAddIn(sAddinName);
             iSwApp.SendMsgToUser2("Всего частей " + Dict.Count + System.Environment.NewLine + "Чертежей сохранено " + itogo, 2, 2);
         }
         #endregion
