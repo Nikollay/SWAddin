@@ -1,4 +1,4 @@
-﻿namespace ASM_XML
+﻿namespace SWAddin
 {
     partial class ConfigForm
     {
