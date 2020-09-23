@@ -226,7 +226,7 @@ namespace SWAddin
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _); //Board.GetFilename();
             if (String.IsNullOrWhiteSpace(filename)) { return; }
             board = Board.GetfromXML(filename);
-            if (board == null) { MessageBox.Show("Неправильный файл"); return; }
+            if (board == null) { MessageBox.Show("XML с неверной структурой","Ошибка чтения файла"); return; }
             ModelDoc2 swModel;
             AssemblyDoc swAssy;
             ModelView activeModelView;
@@ -438,8 +438,9 @@ namespace SWAddin
                 MessageBox.Show(estr, "Не найдены");
                 //swApp.SendMsgToUser2("Не найдены" + estr, 2, 2);
             }
+            iSwApp.CommandInProgress = false;
             //**************
-           
+
         }
         public void GetXML()
         {
@@ -521,7 +522,8 @@ namespace SWAddin
             path = fileName.Substring(0, fileName.Length - 7) + ".xml";
             iSwApp.LoadAddIn(sAddinName);
             doc.Save(path);
-            
+            iSwApp.CommandInProgress = false;
+
         }
         public void GetTiff()
         {
@@ -644,6 +646,7 @@ namespace SWAddin
             }
             iSwApp.LoadAddIn(sAddinName);
             iSwApp.SendMsgToUser2("Всего частей " + Dict.Count + System.Environment.NewLine + "Чертежей сохранено " + itogo, 2, 2);
+            iSwApp.CommandInProgress = false;
         }
         #endregion
 
