@@ -305,6 +305,7 @@ namespace SWAddin
             swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
             //swModel.FeatureManager.FeatureCut3(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false);
 
+            swModel.SketchManager.AddToDB = false;
             swAssy.HideComponent();
             swAssy.ShowComponent();
             swModel.ClearSelection2(true);
