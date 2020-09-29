@@ -271,6 +271,7 @@ namespace SWAddin
             swModel.SketchManager.AddToDB = true;
 
             //Эскизы
+            swModel.SketchManager.DisplayWhenAdded = false;
             foreach (Object skt in board.sketh)
             {
                 if (skt.GetType().FullName == "SWAddin.Line") { Line sk = (Line)skt; swModel.SketchManager.CreateLine(sk.x1, sk.y1, 0, sk.x2, sk.y2, 0); }
@@ -296,8 +297,7 @@ namespace SWAddin
             plane.Select2(false, -1);
             swModel.SketchManager.InsertSketch(false);
             swModel.SketchManager.AddToDB = true;
-            swModel.SketchManager.DisplayWhenAdded = false;
-
+            
             foreach (Circle c in board.circles)
             {
                 swModel.SketchManager.CreateCircleByRadius(c.xc, c.yc, 0, c.radius);
@@ -305,6 +305,7 @@ namespace SWAddin
             swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
             //swModel.FeatureManager.FeatureCut3(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false);
 
+            swModel.SketchManager.DisplayWhenAdded = true;
             swModel.SketchManager.AddToDB = false;
             swAssy.HideComponent();
             swAssy.ShowComponent();

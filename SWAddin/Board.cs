@@ -42,13 +42,20 @@ namespace SWAddin
                     board.ver = 1;
                     return GetXML1(filename);   
                 case "transaction":
-                    board.ver = 2;
-                    return GetXML2(filename);
+                     if (element.Attribute("Type").Value == "SOLIDWORKS") 
+                    {
+                        board.ver = 3; 
+                        return null;// GetXML3(filename); 
+                    }
+                    else
+                    {
+                        board.ver = 2;
+                        return GetXML2(filename);
+                    }
                 default:
                     return null;
             }
- 
-        }
+         }
         private static XDocument GetXML1(string filename)
         {
             XAttribute a1, a2;
@@ -133,6 +140,39 @@ namespace SWAddin
             {
                 return null;
             }
+            return doc_out;
+        }
+        private static XDocument GetXML3(string filename)
+        {
+            string comnpName = "";
+            XDocument doc_out, doc = XDocument.Load(filename);
+            XElement componentXML, atribute, XML, tmpXEl;
+            IEnumerable<XElement> elements, elements2;
+            doc_out = new XDocument();
+            XML = new XElement("XML");
+            doc_out.Add(XML);
+            try
+            {
+                elements = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("components").Elements();
+                foreach (XElement e in elements)
+                {
+                    elements2 = e.Element("properties").Elements();
+                    tmpXEl = elements2.First(item => item.Attribute("name").Value.Equals("Наименование"));
+                    comnpName = tmpXEl.Attribute("value").Value;
+                    componentXML = new XElement("componentXML", new XAttribute("ID", comnpName));
+                    foreach (XElement e2 in elements2)
+                    {
+                        atribute = new XElement("attribute", e2.Attribute("name"), e2.Attribute("value"));
+                        componentXML.Add(atribute);
+                    }
+                    XML.Add(componentXML);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+            //doc_out.Save("d:\\Домашняя работа\\test.xml");
             return doc_out;
         }
         private static Component GetfromXElement(XElement el)
