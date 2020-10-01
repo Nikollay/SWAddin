@@ -358,14 +358,15 @@ namespace SWAddin
                 alfa = 0;
                 x = comp.x;
                 y = comp.y;
+                z = comp.z;
                 if (comp.layer == 1) //Если Top
                 {
-                    z = (comp.z + comp.standOff);
+                    //z = (comp.z + comp.standOff) standOff не учитывается
                     beta = -Math.PI / 2;
                 }
                 else             //Иначе Bottom
                 {
-                    z = (comp.z - comp.standOff) / 1000;
+                    // z = (comp.z - comp.standOff) standOff не учитывается
                     beta = Math.PI / 2;
                 }
                 gamma = -(comp.rotation / 180) * Math.PI;
