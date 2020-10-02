@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.ComponentModel;
 using System.Xml.Linq;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace SWAddin
 {
@@ -30,6 +31,7 @@ namespace SWAddin
         public const int mainItemID1 = 1;
         public const int mainItemID2 = 2;
         public const int mainItemID3 = 3;
+        public const int mainItemID4 = 4;
         string sAddinName = "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS PDM\\PDMSW.dll";
         #endregion
 
@@ -152,7 +154,7 @@ namespace SWAddin
         {
             ICommandGroup cmdGroup;
 
-            int cmdIndex1, cmdIndex2, cmdIndex3;
+            int cmdIndex1, cmdIndex2, cmdIndex3, cmdIndex4;
             string Title = "Addin", ToolTip = "Addin";
 
             int cmdGroupErr = 0;
@@ -162,7 +164,7 @@ namespace SWAddin
             //get the ID information stored in the registry
             bool getDataResult = iCmdMgr.GetGroupDataFromRegistry(mainCmdGroupID, out registryIDs);
 
-            int[] knownIDs = new int[3] { mainItemID1, mainItemID2, mainItemID3 };
+            int[] knownIDs = new int[4] { mainItemID1, mainItemID2, mainItemID3, mainItemID4 };
 
             if (getDataResult)
             {
@@ -178,6 +180,7 @@ namespace SWAddin
             cmdIndex1 = cmdGroup.AddCommandItem2("Создать 3D модель платы", -1, "Создать 3D модель платы PCB", "Создать 3D модель платы PCB", -1, "Create3DPCB", "", mainItemID1, menuToolbarOption);
             cmdIndex2 = cmdGroup.AddCommandItem2("Создать XML", -1, "Создать XML из сборки", "Создать XML из сборки", -1, "GetXML", "", mainItemID2, menuToolbarOption);
             cmdIndex3 = cmdGroup.AddCommandItem2("Создать Tiff", -1, "Создать Tiff картинки чертежей", "Создать Tiff картинки чертежей", -1, "GetTiff", "", mainItemID3, menuToolbarOption);
+            cmdIndex4 = cmdGroup.AddCommandItem2("Создать XLS", -1, "Создать XLS из XML", "Создать XLS из XML", -1, "GetXLS", "", mainItemID4, menuToolbarOption);
 
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
@@ -650,6 +653,20 @@ namespace SWAddin
             iSwApp.LoadAddIn(sAddinName);
             iSwApp.SendMsgToUser2("Всего частей " + Dict.Count + System.Environment.NewLine + "Чертежей сохранено " + itogo, 2, 2);
             iSwApp.CommandInProgress = false;
+        }
+        public void GetXLS()
+        {
+            Excel.Application xlApp = new Excel.Application();
+            xlApp.Visible = false;
+            xlApp.DisplayAlerts = false;
+            string filename;
+            filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _);
+            XDocument doc = XDocument.Load(filename);
+            Excel.Workbook wb = Board.GetfromXDocument(doc, xlApp);
+            xlApp.DisplayAlerts = true;
+            wb.SaveAs(filename + "SP" + ".xlsx");
+            wb.Close();
+            xlApp = null;
         }
         #endregion
 
