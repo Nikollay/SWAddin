@@ -335,22 +335,25 @@ namespace SWAddin
         public static Excel.Workbook GetfromXDocument(XDocument doc, Excel.Application xlApp)
         {
             IEnumerable<XElement> elements1, elements2;
-            Excel.Worksheet wh;
+            Excel.Worksheet wh, wh1,wh2;
+            Excel.Range wc;
             Excel.Workbook wb = xlApp.Workbooks.Add("D:\\PDM\\EPDM_LIBRARY\\EPDM_Specification\\sp.xls");
             XElement tmpXEl;
             string designation;
             //Заполняем шапку
-            wh = wb.Worksheets[1];
+            wh = (Excel.Worksheet)wb.Worksheets[1];
             elements1 = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("graphs").Elements();
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Проект"));
             wh.Cells[1, 1] = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Перв.Примен."));
             wh.Cells[1, 3] = tmpXEl.Attribute("value").Value;
             wh.Cells[3, 14] = "Документация";
-            wh.Cells[3, 14].Font.Underline = true;
-            wh.Cells[3, 14].Font.Bold = true;
-            wh.Cells[3, 14].HorizontalAlignment = -4108; // xlCenter
-            wh.Cells[3, 14].VerticalAlignment = -4108; // xlCenter
+            wc = (Excel.Range)wh.Cells[3, 14];
+            wc.Font.Underline = true;
+            wc.Font.Underline = true;
+            wc.Font.Bold = true;
+            wc.HorizontalAlignment = -4108; // xlCenter
+            wc.VerticalAlignment = -4108; // xlCenter
             wh.Cells[5, 4] = "A3";
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Обозначение"));
             designation = tmpXEl.Attribute("value").Value;
@@ -428,26 +431,31 @@ namespace SWAddin
                 if ((j % 4) == 0) { j++; }
                 if (!d.Value.chapter.Equals(partition))
                 {
+                    wc = (Excel.Range)wh.Cells[j + 2, 14];
                     wh.Cells[j + 2, 14] = d.Value.chapter;
-                    wh.Cells[j + 2, 14].Font.Underline = true;
-                    wh.Cells[j + 2, 14].Font.Bold = true;
-                    wh.Cells[j + 2, 14].HorizontalAlignment = -4108; //xlCenter
-                    wh.Cells[j + 2, 14].VerticalAlignment = -4108; //xlCenter
+                    wc.Font.Underline = true;
+                    wc.Font.Bold = true;
+                    wc.HorizontalAlignment = -4108; //xlCenter
+                    wc.VerticalAlignment = -4108; //xlCenter
                     j += 5;
                     partition = d.Value.chapter;
                 }
 
                 if (j > 26 & wh.Name.Equals(1))
                 {
-                    wb.Sheets.get_Item(wb.Worksheets.Count - 1).Copy(wb.Sheets.get_Item(wb.Worksheets.Count - 2));
-                    wh = wb.Sheets.get_Item(wb.Worksheets.Count - 2);
+                    wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
+                    wh2 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
+                    wh1.Copy(wh2);
+                    wh = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
                     j = 4;
                 }
 
                 if (j > 33)
                 {
-                    wb.Sheets.get_Item(wb.Worksheets.Count - 1).Copy(wb.Sheets.get_Item(wb.Worksheets.Count - 2));
-                    wh = wb.Sheets.get_Item(wb.Worksheets.Count - 2);
+                    wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
+                    wh2 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
+                    wh1.Copy(wh2);
+                    wh = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
                     j = 4;
                 }
 
@@ -467,20 +475,21 @@ namespace SWAddin
 
             }
             //Заполнили
-            wb.Sheets.get_Item(wb.Worksheets.Count - 1).Delete();//Удаляем лист шаблон
+            wh1= (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
+            wh1.Delete();//Удаляем лист шаблон
 
             if (wb.Worksheets.Count == 2)
             {
-                wh = wb.Sheets.get_Item(1);
+                wh = (Excel.Worksheet)wb.Sheets.get_Item(1);
                 wh.Cells[36, 19] = "";
             }
-            if (wb.Worksheets.Count < 4) { wb.Sheets.get_Item("ЛРИ").Delete(); } //Удаляем лист ЛРИ
-                wh = wb.Sheets.get_Item(1);
+            if (wb.Worksheets.Count < 4) { wh1 = (Excel.Worksheet)wb.Sheets.get_Item("ЛРИ"); wh1.Delete(); } //Удаляем лист ЛРИ
+                wh = (Excel.Worksheet)wb.Sheets.get_Item(1);
                 wh.Cells[36, 22] = wb.Worksheets.Count;
 
                 for (int i = 2; i < wb.Worksheets.Count; i++)
                 {
-                    wh = wb.Sheets.get_Item(i);
+                    wh = (Excel.Worksheet)wb.Sheets.get_Item(i);
                     wh.Cells[35, 12] = designation;
                     if (!wh.Name.Equals("ЛРИ"))
                     {
