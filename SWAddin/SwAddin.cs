@@ -180,8 +180,7 @@ namespace SWAddin
             cmdIndex1 = cmdGroup.AddCommandItem2("Создать 3D модель платы", -1, "Создать 3D модель платы PCB", "Создать 3D модель платы PCB", -1, "Create3DPCB", "", mainItemID1, menuToolbarOption);
             cmdIndex2 = cmdGroup.AddCommandItem2("Создать XML", -1, "Создать XML из сборки", "Создать XML из сборки", -1, "GetXML", "", mainItemID2, menuToolbarOption);
             cmdIndex3 = cmdGroup.AddCommandItem2("Создать Tiff", -1, "Создать Tiff картинки чертежей", "Создать Tiff картинки чертежей", -1, "GetTiff", "", mainItemID3, menuToolbarOption);
-            cmdIndex4 = cmdGroup.AddCommandItem2("Создать XLS", -1, "Создать XLS из XML", "Создать XLS из XML", -1, "GetXLS", "", mainItemID4, menuToolbarOption);
-
+            cmdIndex4 = cmdGroup.AddCommandItem2("Создать XLS из XML", -1, "Создать XLS из XML", "Создать XLS из XML", -1, "GetXLS", "", mainItemID4, menuToolbarOption);
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
             cmdGroup.Activate();
@@ -656,14 +655,18 @@ namespace SWAddin
         }
         public void GetXLS()
         {
+            //MessageBox.Show("ДА");
+            string filename;
+            filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _);
+            if (String.IsNullOrWhiteSpace(filename)) { return; }
             Excel.Application xlApp = new Excel.Application();
             xlApp.Visible = false;
             xlApp.DisplayAlerts = false;
-            string filename;
-            filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _);
+            
             XDocument doc = XDocument.Load(filename);
             Excel.Workbook wb = Board.GetfromXDocument(doc, xlApp);
             xlApp.DisplayAlerts = true;
+            filename = filename.Substring(0, filename.Length - 4);
             wb.SaveAs(filename + "SP" + ".xlsx");
             wb.Close();
             xlApp = null;

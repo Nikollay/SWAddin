@@ -418,10 +418,15 @@ namespace SWAddin
                 if (!dict.ContainsKey(key)) { dict.Add(key, component); }
                 else dict[key].quantity++;
             }
+
             //Заполнили словарь *******
             //Сортировка
-            dict.OrderBy(k => k.Key).GroupBy(g => g.Value.chapter);
-
+            string path= "d:\\Домашняя работа\\test.txt";
+            File.WriteAllLines(path, dict.Select(kvp => string.Format(kvp.Key)));
+            dict.OrderBy(k => k.Key);//.GroupBy(g => g.Value.chapter)
+            path = "d:\\Домашняя работа\\test_s.txt";
+            File.WriteAllLines(path, dict.Select(kvp => string.Format(kvp.Key)));
+            //MessageBox.Show(dict.Count.ToString());
             string partition = "Документация";
             int j = 6;
 
