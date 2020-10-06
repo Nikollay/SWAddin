@@ -669,8 +669,9 @@ namespace SWAddin
             filename = filename.Substring(0, filename.Length - 4);
             wb.SaveAs(filename + "SP" + ".xlsx");
             wb.Close();
-            xlApp = null;
+            xlApp.Quit();
         }
+        
         #endregion
 
     }

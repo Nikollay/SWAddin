@@ -374,19 +374,10 @@ namespace SWAddin
             //Заполняем словарь
             elements1 = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("components").Elements();
             Record component;
-            Dictionary<string, Record> dict;
-
-            SortedDictionary<string, Record> dDocumentation, dAssembly, dParts, dStandard, dOther, dMaterials, dKits, dNone;
-            dDocumentation = new SortedDictionary<string, Record>();
-            dAssembly = new SortedDictionary<string, Record>();
-            dParts = new SortedDictionary<string, Record>();
-            dStandard = new SortedDictionary<string, Record>();
-            dOther = new SortedDictionary<string, Record>();
-            dMaterials = new SortedDictionary<string, Record>();
-            dKits = new SortedDictionary<string, Record>();
-            dNone = new SortedDictionary<string, Record>();
-
-            dict = new Dictionary<string, Record>();
+            SortedDictionary<string, Record> dictS;
+            dictS = new SortedDictionary<string, Record>();
+            List<Record> list;
+            list = new List<Record>();
             string key;
             foreach (XElement e1 in elements1)
             {
@@ -415,35 +406,41 @@ namespace SWAddin
                     }
                 }
                 key = component.designation + (char)32 + component.title;
-                if (!dict.ContainsKey(key)) { dict.Add(key, component); }
-                else dict[key].quantity++;
+                if (!dictS.ContainsKey(key)) { dictS.Add(key, component); }
+                else dictS[key].quantity++;
             }
 
             //Заполнили словарь *******
             //Сортировка
-            string path= "d:\\Домашняя работа\\test.txt";
-            File.WriteAllLines(path, dict.Select(kvp => string.Format(kvp.Key)));
-            dict.OrderBy(k => k.Key);//.GroupBy(g => g.Value.chapter)
-            path = "d:\\Домашняя работа\\test_s.txt";
-            File.WriteAllLines(path, dict.Select(kvp => string.Format(kvp.Key)));
+            var dict = dictS.GroupBy(g => g.Value.chapter).OrderBy(n => n.Key, new CustomComparer()).ToDictionary(group => group.Key, group => group.ToDictionary(pair => pair.Key, pair => pair.Value));
+            foreach (var d in dict.Values)
+            {
+                foreach (var v in d.Values) { list.Add(v); }
+            }
+            //string path= "d:\\Домашняя работа\\test.txt";
+            //File.WriteAllLines(path, dictS.Select(kvp => string.Format("{0};{1}", kvp.Key, kvp.Value.quantity)));
+            //dict = (Dictionary<string, Record>)dictS.GroupBy(g => g.Value.chapter);
+            //path = "d:\\Домашняя работа\\test_s.txt";
+            //File.WriteAllLines(path, dict.Select(kvp => string.Format("{0};{1}", kvp.Key, kvp.Value.quantity)));
             //MessageBox.Show(dict.Count.ToString());
             string partition = "Документация";
             int j = 6;
 
+
             //Заполняем листы
-            foreach (KeyValuePair<string, Record> d in dict)
+            foreach (Record lr in list)
             {
                 if ((j % 4) == 0) { j++; }
-                if (!d.Value.chapter.Equals(partition))
+                if (!lr.chapter.Equals(partition))
                 {
                     wc = (Excel.Range)wh.Cells[j + 2, 14];
-                    wh.Cells[j + 2, 14] = d.Value.chapter;
+                    wh.Cells[j + 2, 14] = lr.chapter;
                     wc.Font.Underline = true;
                     wc.Font.Bold = true;
                     wc.HorizontalAlignment = -4108; //xlCenter
                     wc.VerticalAlignment = -4108; //xlCenter
                     j += 5;
-                    partition = d.Value.chapter;
+                    partition = lr.chapter;
                 }
 
                 if (j > 26 & wh.Name.Equals(1))
@@ -464,23 +461,23 @@ namespace SWAddin
                     j = 4;
                 }
 
-                wh.Cells[j, 4] = d.Value.format;
-                wh.Cells[j, 9] = d.Value.designation;
-                wh.Cells[j, 20] = d.Value.quantity;
-                wh.Cells[j, 21] = d.Value.note;
+                wh.Cells[j, 4] = lr.format;
+                wh.Cells[j, 9] = lr.designation;
+                wh.Cells[j, 20] = lr.quantity;
+                wh.Cells[j, 21] = lr.note;
+                //wh.Cells[j, 14] = lr.title;
+                if (lr.title.Length < 32) { wh.Cells[j, 14] = lr.title; }
 
-                if (d.Value.title.Length < 32) { wh.Cells[j, 14] = d.Value.title; }
-
-                if (d.Value.title.Length > 31)
+                if (lr.title.Length > 32)
                 {
-                    wh.Cells[j, 14] = d.Value.title.Substring(0, 31);
-                    wh.Cells[j + 1, 14] = d.Value.title.Substring(31);
+                    wh.Cells[j, 14] = lr.title.Substring(0, 31);
+                    wh.Cells[j + 1, 14] = lr.title.Substring(31);
                     j += 1;
                 }
 
             }
             //Заполнили
-            wh1= (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
+            wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
             wh1.Delete();//Удаляем лист шаблон
 
             if (wb.Worksheets.Count == 2)
@@ -632,6 +629,46 @@ namespace SWAddin
 
             //Console.ReadKey();
             return new XDocument();
+        }
+        public class CustomComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+
+            {
+                if (wt(x) < wt(y))
+                    return -1;
+                if (wt(x) > wt(y))
+                    return 1;
+                else return 0;
+
+                //"Документация" "Сборочные единицы" "Стандартные изделия" "Прочие изделия" "Материалы" "Комплекты" 
+                // do your own comparison however you like; return a negative value
+                // to indicate that x < y, a positive value to indicate that x > y,
+                // or 0 to indicate that they are equal.
+            }
+            private int wt(string arg)
+
+            {
+                switch (arg)
+                {
+                    case "Документация":
+                        return 1;
+                    case "Сборочные единицы":
+                        return 2;
+                    case "Детали":
+                        return 3;
+                    case "Стандартные изделия":
+                        return 4;
+                    case "Прочие изделия":
+                        return 5;
+                    case "Материалы":
+                        return 6;
+                    case "Комплекты":
+                        return 7;
+                    default:
+                        return 8;
+                }
+            }
         }
     }
 }
