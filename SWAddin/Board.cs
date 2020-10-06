@@ -443,11 +443,11 @@ namespace SWAddin
                     partition = lr.chapter;
                 }
 
-                if (j > 26 & wh.Name.Equals(1))
+                if ((j > 26)&(wh.Name.Equals('1')))
                 {
                     wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
                     wh2 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
-                    wh1.Copy(wh2);
+                    wh1.Copy(After: wh2);
                     wh = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
                     j = 4;
                 }
@@ -456,7 +456,7 @@ namespace SWAddin
                 {
                     wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
                     wh2 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
-                    wh1.Copy(wh2);
+                    wh1.Copy(After: wh2);
                     wh = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
                     j = 4;
                 }
@@ -474,7 +474,7 @@ namespace SWAddin
                     wh.Cells[j + 1, 14] = lr.title.Substring(31);
                     j += 1;
                 }
-
+                j += 1;
             }
             //Заполнили
             wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
@@ -486,10 +486,10 @@ namespace SWAddin
                 wh.Cells[36, 19] = "";
             }
             if (wb.Worksheets.Count < 4) { wh1 = (Excel.Worksheet)wb.Sheets.get_Item("ЛРИ"); wh1.Delete(); } //Удаляем лист ЛРИ
-                wh = (Excel.Worksheet)wb.Sheets.get_Item(1);
-                wh.Cells[36, 22] = wb.Worksheets.Count;
+            wh = (Excel.Worksheet)wb.Sheets.get_Item(1);
+            wh.Cells[36, 22] = wb.Worksheets.Count;
 
-                for (int i = 2; i < wb.Worksheets.Count; i++)
+            for (int i = 2; i < wb.Worksheets.Count; i++)
                 {
                     wh = (Excel.Worksheet)wb.Sheets.get_Item(i);
                     wh.Cells[35, 12] = designation;
