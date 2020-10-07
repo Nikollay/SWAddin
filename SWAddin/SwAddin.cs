@@ -659,12 +659,14 @@ namespace SWAddin
             string filename;
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _);
             if (String.IsNullOrWhiteSpace(filename)) { return; }
+
             Excel.Application xlApp = new Excel.Application();
             xlApp.Visible = false;
             xlApp.DisplayAlerts = false;
             
             XDocument doc = XDocument.Load(filename);
             Excel.Workbook wb = Board.GetfromXDocument(doc, xlApp);
+            if (wb == null) { MessageBox.Show("XML с неверной структурой", "Ошибка чтения файла"); return; }
             xlApp.DisplayAlerts = true;
             filename = filename.Substring(0, filename.Length - 4);
             wb.SaveAs(filename + "SP" + ".xlsx");

@@ -335,24 +335,31 @@ namespace SWAddin
         public static Excel.Workbook GetfromXDocument(XDocument doc, Excel.Application xlApp)
         {
             IEnumerable<XElement> elements1, elements2;
-            Excel.Worksheet wh, wh1,wh2;
+            Excel.Worksheet wh, wh1, wh2;
             Excel.Range wc;
             Excel.Workbook wb = xlApp.Workbooks.Add("D:\\PDM\\EPDM_LIBRARY\\EPDM_Specification\\sp.xls");
             XElement tmpXEl;
             string designation;
             //Заполняем шапку
             wh = (Excel.Worksheet)wb.Worksheets[1];
+            try
+            { 
             elements1 = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("graphs").Elements();
+            }
+            catch
+            {
+                return null;
+            }
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Проект"));
             wh.Cells[1, 1] = tmpXEl.Attribute("value").Value;
-            tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Перв.Примен."));
+            tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Первичная применяемость")|item.Attribute("name").Value.Equals("Перв.Примен."));
             wh.Cells[1, 3] = tmpXEl.Attribute("value").Value;
             wh.Cells[3, 14] = "Документация";
             wc = (Excel.Range)wh.Cells[3, 14];
             wc.Font.Underline = true;
             wc.Font.Underline = true;
             wc.Font.Bold = true;
-            wc.HorizontalAlignment = -4108; // xlCenter
+            wc.HorizontalAlignment = -4108; // xlCenterF
             wc.VerticalAlignment = -4108; // xlCenter
             wh.Cells[5, 4] = "A3";
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Обозначение"));
@@ -362,17 +369,24 @@ namespace SWAddin
             wh.Cells[32, 12] = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Наименование"));
             wh.Cells[35, 12] = tmpXEl.Attribute("value").Value;
-            tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("п_Разраб"));
+            tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Разработал конструктор")|item.Attribute("name").Value.Contains("п_Разраб"));
             wh.Cells[35, 8] = tmpXEl.Attribute("value").Value;
-            tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("п_Пров_P"));
+            tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Проверил конструктор")|item.Attribute("name").Value.Contains("п_Пров_P"));
             wh.Cells[36, 8] = tmpXEl.Attribute("value").Value;
-            tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("п_Н_контр"));
+            tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Нормоконтроль")|item.Attribute("name").Value.Contains("п_Н_контр"));
             wh.Cells[38, 8] = tmpXEl.Attribute("value").Value;
-            tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("п_Утв"));
+            tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Утвердил")|item.Attribute("name").Value.Contains("п_Утв"));
             wh.Cells[39, 8] = tmpXEl.Attribute("value").Value;
 
             //Заполняем словарь
+            try
+            { 
             elements1 = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("components").Elements();
+            }
+            catch
+            {
+                return null;
+            }
             Record component;
             SortedDictionary<string, Record> dictS;
             dictS = new SortedDictionary<string, Record>();
@@ -443,7 +457,7 @@ namespace SWAddin
                     partition = lr.chapter;
                 }
 
-                if ((j > 26)&(wh.Name.Equals('1')))
+                if ((j > 26)&(wh.Name.Equals("1")))
                 {
                     wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
                     wh2 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
@@ -466,7 +480,7 @@ namespace SWAddin
                 wh.Cells[j, 20] = lr.quantity;
                 wh.Cells[j, 21] = lr.note;
                 //wh.Cells[j, 14] = lr.title;
-                if (lr.title.Length < 32) { wh.Cells[j, 14] = lr.title; }
+                if (lr.title.Length < 33) { wh.Cells[j, 14] = lr.title; }
 
                 if (lr.title.Length > 32)
                 {
@@ -489,7 +503,7 @@ namespace SWAddin
             wh = (Excel.Worksheet)wb.Sheets.get_Item(1);
             wh.Cells[36, 22] = wb.Worksheets.Count;
 
-            for (int i = 2; i < wb.Worksheets.Count; i++)
+            for (int i = 2; i < wb.Worksheets.Count+1; i++)
                 {
                     wh = (Excel.Worksheet)wb.Sheets.get_Item(i);
                     wh.Cells[35, 12] = designation;
@@ -635,9 +649,9 @@ namespace SWAddin
             public int Compare(string x, string y)
 
             {
-                if (wt(x) < wt(y))
+                if (Wt(x) < Wt(y))
                     return -1;
-                if (wt(x) > wt(y))
+                if (Wt(x) > Wt(y))
                     return 1;
                 else return 0;
 
@@ -646,7 +660,7 @@ namespace SWAddin
                 // to indicate that x < y, a positive value to indicate that x > y,
                 // or 0 to indicate that they are equal.
             }
-            private int wt(string arg)
+            private int Wt(string arg)
 
             {
                 switch (arg)
