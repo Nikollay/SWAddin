@@ -332,7 +332,7 @@ namespace SWAddin
                         
             foreach (Component comp in board.components)
             {
-                sample = comp.title;
+                sample = comp.part_Number;
                 if (board.ver==2) { sample = comp.footprint; }
                 comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
                 if (String.IsNullOrWhiteSpace(comp.fileName))
