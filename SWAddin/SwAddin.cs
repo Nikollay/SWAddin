@@ -337,7 +337,7 @@ namespace SWAddin
                 sample = comp.title;
                 if (board.ver==2) { sample = comp.footprint; }
                 comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
-                if (String.IsNullOrWhiteSpace(comp.fileName))
+                if (String.IsNullOrWhiteSpace(comp.fileName)&(board.ver != 2))
                 {
                     comp.fileName = allFoundFiles.Find(item => item.Contains(comp.part_Number));
                 }
