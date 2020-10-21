@@ -332,9 +332,15 @@ namespace SWAddin
                         
             foreach (Component comp in board.components)
             {
-                sample = comp.part_Number;
+                //Выбор по какому полю искать 3Д модель
+                //sample = comp.part_Number;
+                sample = comp.title;
                 if (board.ver==2) { sample = comp.footprint; }
                 comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
+                if (String.IsNullOrWhiteSpace(comp.fileName))
+                {
+                    comp.fileName = allFoundFiles.Find(item => item.Contains(comp.part_Number));
+                }
                 if (String.IsNullOrWhiteSpace(comp.fileName))
                 {
                     comp.fileName = "D:\\PDM\\Прочие изделия\\ЭРИ\\Zero.SLDPRT";
@@ -360,15 +366,17 @@ namespace SWAddin
                 alfa = 0;
                 x = comp.x;
                 y = comp.y;
-                z = comp.z;
+                //z = comp.z;
                 if (comp.layer == 1) //Если Top
                 {
                     //z = (comp.z + comp.standOff) standOff не учитывается
+                    z = board.thickness;
                     beta = -Math.PI / 2;
                 }
                 else             //Иначе Bottom
                 {
                     // z = (comp.z - comp.standOff) standOff не учитывается
+                    z = 0;
                     beta = Math.PI / 2;
                 }
                 gamma = -(comp.rotation / 180) * Math.PI;
