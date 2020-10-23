@@ -335,7 +335,11 @@ namespace SWAddin
                 //Выбор по какому полю искать 3Д модель
                 //sample = comp.part_Number;
                 sample = comp.title;
-                if (board.ver==2) { sample = comp.footprint; }
+                if (board.ver==2) 
+                {
+                    sample = comp.footprint;
+                    if (sample.EndsWith("N")|sample.EndsWith("M")|sample.EndsWith("L")) { sample = sample.Remove(sample.Length - 1); }   
+                }
                 comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
                 if (String.IsNullOrWhiteSpace(comp.fileName)&(board.ver != 2))
                 {
@@ -447,7 +451,9 @@ namespace SWAddin
 
             if (empty.Count != 0)
             {
-                foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Value + System.Environment.NewLine; }
+                StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 3) + "txt", true);
+                foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Value + System.Environment.NewLine; writer.WriteLine(str.Value); }
+                writer.Close();
                 MessageBox.Show(estr, "Не найдены");
                 //swApp.SendMsgToUser2("Не найдены" + estr, 2, 2);
             }
