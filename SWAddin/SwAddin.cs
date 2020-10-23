@@ -451,7 +451,7 @@ namespace SWAddin
 
             if (empty.Count != 0)
             {
-                StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 3) + "txt", true);
+                StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 3) + "txt", false);
                 foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Value + System.Environment.NewLine; writer.WriteLine(str.Value); }
                 writer.Close();
                 MessageBox.Show(estr, "Не найдены");
