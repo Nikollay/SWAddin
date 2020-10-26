@@ -173,7 +173,7 @@ namespace SWAddin
             name[2] = new XAttribute("name", "Количество");
             value[2] = new XAttribute("value", "");
             name[3] = new XAttribute("name", "Подраздел СП");
-            value[3] = new XAttribute("value", "");
+            value[3] = new XAttribute("value", comp.type);
             name[4] = new XAttribute("name", "Подраздел ВП");
             value[4] = new XAttribute("value", "");
             name[5] = new XAttribute("name", "Примечание");
