@@ -110,7 +110,7 @@ namespace SWAddin
             try
             {
                 elements = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("graphs").Elements();
-                tmpXEl = elements.First(item => item.Attribute("name").Value.Equals("Обозначение_PCB"));
+                tmpXEl = elements.First(item => item.Attribute("name").Value.Equals("Обозначение_PCB")|item.Attribute("name").Value.Equals("Обозначение PCB"));
                 descriptionPCB = tmpXEl.Attribute("value").Value;
                 componentXML = new XElement("componentXML", new XAttribute("AD_ID", descriptionPCB));
                 elements = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("componentsPCB").Element("component_pcb").Element("properties").Elements();
