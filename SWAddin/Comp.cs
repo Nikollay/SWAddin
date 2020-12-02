@@ -48,9 +48,9 @@ namespace SWAddin
             return Math.Round(alpha * 180 / Math.PI, 2) + "; " + Math.Round(beta * 180 / Math.PI, 2) + "; " + Math.Round(gamma * 180 / Math.PI, 2);
         }
 
-        public static List<Comp> GetColl(AssemblyDoc swAssy, SldWorks swApp)
+        public static List<Comp> GetColl(SldWorks swApp)
         {
-
+            AssemblyDoc swAssy;
             Comp component;
             List<Comp> coll;
             object[] comps;
@@ -65,74 +65,76 @@ namespace SWAddin
             string path;
 
             coll = new List<Comp>();
-
+            //swModel.ShowConfiguration2(f.conf[i]);
+            swAssy = (AssemblyDoc)swApp.ActiveDoc;
             swAssy.ResolveAllLightWeightComponents(false);
-
             comps = (object[])swAssy.GetComponents(true);
-
+            
+            
             for (int i = 0; i < comps.Length; i++)
             {
+                           
+                    component = new Comp();
+                    swModel = (ModelDoc2)swAssy;
+                    swModelDocExt = swModel.Extension;
 
-                component = new Comp();
-                swModel = (ModelDoc2)swAssy;
-                swModelDocExt = swModel.Extension;
 
+                    confManager = (ConfigurationManager)swModel.ConfigurationManager;
+                    configuration = confManager.ActiveConfiguration.Name;
+                    prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
+                    prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
+                    component.used = valOut;
 
-                confManager = (ConfigurationManager)swModel.ConfigurationManager;
-                configuration = confManager.ActiveConfiguration.Name;
-                prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
-                prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
-                component.used = valOut;
-
-                comp = (Component2)comps[i];
-                path = comp.GetPathName();
-                if ((comp.GetSuppression() != (int)swComponentSuppressionState_e.swComponentSuppressed) & (comps[i] != null))
-                {
-
-                    aTrans = (double[])comp.Transform2.ArrayData;
-                    if (path.ToUpper().EndsWith(".SLDASM")) { docType = (swDocumentTypes_e)swDocumentTypes_e.swDocASSEMBLY; }
-                    if (path.ToUpper().EndsWith(".SLDPRT")) { docType = (swDocumentTypes_e)swDocumentTypes_e.swDocPART; }
-                    int errs = 0, wrns = 0;
-                    compDoc = swApp.OpenDoc6(path, (int)docType, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errs, ref wrns);
-                    if (compDoc == null) { compDoc = (ModelDoc2)comp.GetModelDoc2(); }
-                    if (compDoc == null)
+                    comp = (Component2)comps[i];
+                    path = comp.GetPathName();
+                    if ((comp.GetSuppression() != (int)swComponentSuppressionState_e.swComponentSuppressed) & (comps[i] != null))
                     {
-                        swApp.SendMsgToUser2("Не могу загрузить "+path, 4, 2);
-                        swApp.ExitApp();
-                        System.Environment.Exit(0);
-                    }    
-                    configuration = (string)comp.ReferencedConfiguration;
-                    swModelDocExt = (ModelDocExtension)compDoc.Extension;
-                    prpMgr = (CustomPropertyManager)swModelDocExt.get_CustomPropertyManager(configuration);
 
-                    prpMgr.Get6("Формат", true, out valOut, out _, out _, out _);
-                    component.format = valOut;
-                    prpMgr.Get6("Обозначение", true, out valOut, out _, out _, out _);
-                    component.designation = valOut;
-                    prpMgr.Get6("Наименование", true, out valOut, out _, out _, out _);
-                    component.name = valOut;
-                    prpMgr.Get6("Примечание", true, out valOut, out _, out _, out _);
-                    component.note = valOut;
-                    prpMgr.Get6("Раздел", true, out valOut, out _, out _, out _);
-                    component.chapter = valOut;
-                    prpMgr.Get6("Перв.Примен.", true, out valOut, out _, out _, out _);
-                    component.included = valOut;
+                        aTrans = (double[])comp.Transform2.ArrayData;
+                        if (path.ToUpper().EndsWith(".SLDASM")) { docType = (swDocumentTypes_e)swDocumentTypes_e.swDocASSEMBLY; }
+                        if (path.ToUpper().EndsWith(".SLDPRT")) { docType = (swDocumentTypes_e)swDocumentTypes_e.swDocPART; }
+                        int errs = 0, wrns = 0;
+                        compDoc = swApp.OpenDoc6(path, (int)docType, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errs, ref wrns);
+                        if (compDoc == null) { compDoc = (ModelDoc2)comp.GetModelDoc2(); }
+                        if (compDoc == null)
+                        {
+                            swApp.SendMsgToUser2("Не могу загрузить " + path, 4, 2);
+                            swApp.ExitApp();
+                            System.Environment.Exit(0);
+                        }
+                        configuration = (string)comp.ReferencedConfiguration;
+                        swModelDocExt = (ModelDocExtension)compDoc.Extension;
+                        prpMgr = (CustomPropertyManager)swModelDocExt.get_CustomPropertyManager(configuration);
 
-                    if ((component.chapter == "Стандартные изделия") | (component.chapter == "Прочие изделия"))
-                    {
-                        prpMgr.Get6("Документ на поставку", true, out valOut, out _, out _, out _);
-                        component.doc = valOut;
-                        component.type = component.name.Substring(0, component.name.IndexOf((char)32));
+                        prpMgr.Get6("Формат", true, out valOut, out _, out _, out _);
+                        component.format = valOut;
+                        prpMgr.Get6("Обозначение", true, out valOut, out _, out _, out _);
+                        component.designation = valOut;
+                        prpMgr.Get6("Наименование", true, out valOut, out _, out _, out _);
+                        component.name = valOut;
+                        prpMgr.Get6("Примечание", true, out valOut, out _, out _, out _);
+                        component.note = valOut;
+                        prpMgr.Get6("Раздел", true, out valOut, out _, out _, out _);
+                        component.chapter = valOut;
+                        prpMgr.Get6("Перв.Примен.", true, out valOut, out _, out _, out _);
+                        component.included = valOut;
+
+                        if ((component.chapter == "Стандартные изделия") | (component.chapter == "Прочие изделия"))
+                        {
+                            prpMgr.Get6("Документ на поставку", true, out valOut, out _, out _, out _);
+                            component.doc = valOut;
+                            component.type = component.name.Substring(0, component.name.IndexOf((char)32));
+                        }
+
+                        component.x = Math.Round((aTrans[9] * 1000), 2);
+                        component.y = Math.Round((aTrans[10] * 1000), 2);
+                        component.z = Math.Round((aTrans[11] * 1000), 2);
+                        component.rotation = Euler(aTrans);
+                        component.quantity = 1;
+
+                        coll.Add(component);
                     }
-
-                    component.x = Math.Round((aTrans[9] * 1000), 2);
-                    component.y = Math.Round((aTrans[10] * 1000), 2);
-                    component.z = Math.Round((aTrans[11] * 1000), 2);
-                    component.rotation = Euler(aTrans);
-                    component.quantity = 1;
-
-                    coll.Add(component);
-                }
+                
             }
 
             foreach (Comp k in coll)

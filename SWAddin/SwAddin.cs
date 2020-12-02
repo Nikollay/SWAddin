@@ -497,14 +497,13 @@ namespace SWAddin
                 iSwApp.SendMsgToUser2("Откройте сборку", 4, 2);
                 return;
             }
-            swAssy = (AssemblyDoc)swModel;
+            
 
             doc = new XDocument(new XDeclaration("1.0", "Windows-1251", "Yes"));
             xml = new XElement("xml");
             transaction = new XElement("transaction", new XAttribute("Type", "SOLIDWORKS"), new XAttribute("version", "1.1"), new XAttribute("Date", DateTime.Now.ToString("d")), new XAttribute("Time", DateTime.Now.ToString("T")));
             project = new XElement("project", new XAttribute("Project_Path", fileName), new XAttribute("Project_Name", swModel.GetTitle() + ".SldAsm"));
             configurations = new XElement("configurations");
-            components = new XElement("components");
             сonfNames = (string[])swModel.GetConfigurationNames();
             conf = new List<string>(сonfNames);
 
@@ -523,8 +522,11 @@ namespace SWAddin
             for (int i = 0; i < f.conf.Count; i++)
             {
                 swModel.ShowConfiguration2(f.conf[i]);
+                swAssy = (AssemblyDoc)swModel;
                 configuration = new XElement("configuration", new XAttribute("name", f.conf[i]));
-                coll = Comp.GetColl(swAssy, (SldWorks)iSwApp);
+                coll = Comp.GetColl((SldWorks)iSwApp);
+                //iSwApp.SendMsgToUser2("Всего " + coll.Count, 2, 2);
+                components = new XElement("components");
                 foreach (Comp k in coll)
                 {
                     component = Comp.GetComponent(k);
@@ -533,6 +535,7 @@ namespace SWAddin
                 if (i == 0) { configuration.Add(Comp.GetGraphs(swAssy)); }
                 configuration.Add(components);
                 configurations.Add(configuration);
+                //swModel.ShowConfiguration2(f.conf[0]);
             }
             project.Add(configurations);
             transaction.Add(project);
