@@ -204,7 +204,7 @@ namespace SWAddin
             value[16] = new XAttribute("value", comp.doc);
             name[17] = new XAttribute("name", "Код продукции");
             value[17] = new XAttribute("value", "");
-            name[18] = new XAttribute("name", "Поставщик");
+            name[18] = new XAttribute("name", "Производитель");
             value[18] = new XAttribute("value", "");
             name[19] = new XAttribute("name", "Тип");
             value[19] = new XAttribute("value", comp.type);
