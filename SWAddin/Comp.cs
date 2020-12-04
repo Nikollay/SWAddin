@@ -162,8 +162,8 @@ namespace SWAddin
         {
 
             XAttribute[] name, value;
-            name = new XAttribute[26];
-            value = new XAttribute[26];
+            name = new XAttribute[28];
+            value = new XAttribute[28];
             XElement property, properties, component;
             properties = new XElement("properties");
             component = new XElement("component");
@@ -196,30 +196,34 @@ namespace SWAddin
             value[12] = new XAttribute("value", comp.designation);
             name[13] = new XAttribute("name", "Формат");
             value[13] = new XAttribute("value", comp.format);
-            name[14] = new XAttribute("name", "Документ на поставку");
-            value[14] = new XAttribute("value", comp.doc);
-            name[15] = new XAttribute("name", "Код продукции");
+            name[14] = new XAttribute("name", "Зона");
+            value[14] = new XAttribute("value", "");
+            name[15] = new XAttribute("name", "Позиция");
             value[15] = new XAttribute("value", "");
-            name[16] = new XAttribute("name", "Поставщик");
-            value[16] = new XAttribute("value", "");
-            name[17] = new XAttribute("name", "Тип");
-            value[17] = new XAttribute("value", comp.type);
-            name[18] = new XAttribute("name", "Куда входит");
-            value[18] = new XAttribute("value", comp.used);
-            name[19] = new XAttribute("name", "Footprint");
-            value[19] = new XAttribute("value", "");
-            name[20] = new XAttribute("name", "X");
-            value[20] = new XAttribute("value", comp.x);
-            name[21] = new XAttribute("name", "Y");
-            value[21] = new XAttribute("value", comp.y);
-            name[22] = new XAttribute("name", "Z");
-            value[22] = new XAttribute("value", comp.z);
-            name[23] = new XAttribute("name", "Layer");
-            value[23] = new XAttribute("value", "1");
-            name[24] = new XAttribute("name", "Rotation");
-            value[24] = new XAttribute("value", comp.rotation);
-            name[25] = new XAttribute("name", "StandOff");
-            value[25] = new XAttribute("value", "0");
+            name[16] = new XAttribute("name", "Документ на поставку");
+            value[16] = new XAttribute("value", comp.doc);
+            name[17] = new XAttribute("name", "Код продукции");
+            value[17] = new XAttribute("value", "");
+            name[18] = new XAttribute("name", "Поставщик");
+            value[18] = new XAttribute("value", "");
+            name[19] = new XAttribute("name", "Тип");
+            value[19] = new XAttribute("value", comp.type);
+            name[20] = new XAttribute("name", "Куда входит");
+            value[20] = new XAttribute("value", comp.used);
+            name[21] = new XAttribute("name", "Footprint");
+            value[21] = new XAttribute("value", "");
+            name[22] = new XAttribute("name", "X");
+            value[22] = new XAttribute("value", comp.x);
+            name[23] = new XAttribute("name", "Y");
+            value[23] = new XAttribute("value", comp.y);
+            name[24] = new XAttribute("name", "Z");
+            value[24] = new XAttribute("value", comp.z);
+            name[25] = new XAttribute("name", "Layer");
+            value[25] = new XAttribute("value", "1");
+            name[26] = new XAttribute("name", "Rotation");
+            value[26] = new XAttribute("value", comp.rotation);
+            name[27] = new XAttribute("name", "StandOff");
+            value[27] = new XAttribute("value", "0");
 
             for (int i = 0; i < name.Length; i++)
             {
@@ -311,11 +315,11 @@ namespace SWAddin
             value[18] = new XAttribute("value", "");
             name[19] = new XAttribute("name", "Наименование");
             value[19] = new XAttribute("value", title);
-            name[20] = new XAttribute("name", "Литера3");
+            name[20] = new XAttribute("name", "Литера1");
             value[20] = new XAttribute("value", "");
             name[21] = new XAttribute("name", "Литера2");
             value[21] = new XAttribute("value", "");
-            name[22] = new XAttribute("name", "Литера");
+            name[22] = new XAttribute("name", "Литера3");
             value[22] = new XAttribute("value", "");
             name[23] = new XAttribute("name", "Код документа");
             value[23] = new XAttribute("value", "");
