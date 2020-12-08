@@ -162,8 +162,8 @@ namespace SWAddin
         {
 
             XAttribute[] name, value;
-            name = new XAttribute[28];
-            value = new XAttribute[28];
+            name = new XAttribute[29];
+            value = new XAttribute[29];
             XElement property, properties, component;
             properties = new XElement("properties");
             component = new XElement("component");
@@ -204,26 +204,28 @@ namespace SWAddin
             value[16] = new XAttribute("value", comp.doc);
             name[17] = new XAttribute("name", "Код продукции");
             value[17] = new XAttribute("value", "");
-            name[18] = new XAttribute("name", "Производитель");
+            name[18] = new XAttribute("name", "Поставщик");
             value[18] = new XAttribute("value", "");
-            name[19] = new XAttribute("name", "Тип");
-            value[19] = new XAttribute("value", comp.type);
-            name[20] = new XAttribute("name", "Куда входит");
-            value[20] = new XAttribute("value", comp.used);
-            name[21] = new XAttribute("name", "Footprint");
-            value[21] = new XAttribute("value", "");
-            name[22] = new XAttribute("name", "X");
-            value[22] = new XAttribute("value", comp.x);
-            name[23] = new XAttribute("name", "Y");
-            value[23] = new XAttribute("value", comp.y);
-            name[24] = new XAttribute("name", "Z");
-            value[24] = new XAttribute("value", comp.z);
-            name[25] = new XAttribute("name", "Layer");
-            value[25] = new XAttribute("value", "1");
-            name[26] = new XAttribute("name", "Rotation");
-            value[26] = new XAttribute("value", comp.rotation);
-            name[27] = new XAttribute("name", "StandOff");
-            value[27] = new XAttribute("value", "0");
+            name[19] = new XAttribute("name", "Производитель");
+            value[19] = new XAttribute("value", "");
+            name[20] = new XAttribute("name", "Тип");
+            value[20] = new XAttribute("value", comp.type);
+            name[21] = new XAttribute("name", "Куда входит");
+            value[21] = new XAttribute("value", comp.used);
+            name[22] = new XAttribute("name", "Footprint");
+            value[22] = new XAttribute("value", "");
+            name[23] = new XAttribute("name", "X");
+            value[23] = new XAttribute("value", comp.x);
+            name[24] = new XAttribute("name", "Y");
+            value[24] = new XAttribute("value", comp.y);
+            name[25] = new XAttribute("name", "Z");
+            value[25] = new XAttribute("value", comp.z);
+            name[26] = new XAttribute("name", "Layer");
+            value[26] = new XAttribute("value", "1");
+            name[27] = new XAttribute("name", "Rotation");
+            value[27] = new XAttribute("value", comp.rotation);
+            name[28] = new XAttribute("name", "StandOff");
+            value[28] = new XAttribute("value", "0");
 
             for (int i = 0; i < name.Length; i++)
             {
