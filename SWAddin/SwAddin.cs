@@ -222,7 +222,7 @@ namespace SWAddin
 
         public void Create3DPCB()
         {
-            iSwApp.CommandInProgress = true;
+            //iSwApp.CommandInProgress = true;
             Board board;
             string filename;
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _); //Board.GetFilename();
@@ -457,13 +457,13 @@ namespace SWAddin
                 MessageBox.Show(estr, "Не найдены");
                 //swApp.SendMsgToUser2("Не найдены" + estr, 2, 2);
             }
-            iSwApp.CommandInProgress = false;
+            //iSwApp.CommandInProgress = false;
             //**************
 
         }
         public void GetXML()
         {
-            iSwApp.CommandInProgress = true;
+            //iSwApp.CommandInProgress = true;
             ModelDoc2 swModel;
             AssemblyDoc swAssy;
             List<Comp> coll;
@@ -544,13 +544,13 @@ namespace SWAddin
             path = fileName.Substring(0, fileName.Length - 7) + ".xml";
             iSwApp.LoadAddIn(sAddinName);
             doc.Save(path);
-            iSwApp.CommandInProgress = false;
+            //iSwApp.CommandInProgress = false;
 
         }
         public void GetTiff()
         {
             //object obt= iSwApp.GetAddInObject("ConisioSW2.ConisioSWAddIn") as SwAddin;
-            iSwApp.CommandInProgress = true;
+            //iSwApp.CommandInProgress = true;
             ModelDoc2 swModel;
             ModelDocExtension swModelDocExt;
             AssemblyDoc swAssy;
@@ -668,7 +668,7 @@ namespace SWAddin
             }
             iSwApp.LoadAddIn(sAddinName);
             iSwApp.SendMsgToUser2("Всего частей " + Dict.Count + System.Environment.NewLine + "Чертежей сохранено " + itogo, 2, 2);
-            iSwApp.CommandInProgress = false;
+            //iSwApp.CommandInProgress = false;
         }
         public void GetXLS()
         {
