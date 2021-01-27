@@ -19,6 +19,7 @@ namespace SWAddin
         public List<Object> sketh, cutout;
         public double thickness;
         public int ver;
+        public string designator;
 
         public static Board GetfromXML(string filename)
         {
@@ -233,6 +234,7 @@ namespace SWAddin
             board.sketh = new List<object>();
             board.cutout = new List<object>();
             board.circles = new List<Circle>();
+            board.designator = el.FirstAttribute.Value;
             foreach (XElement e in elements)
             {
                 switch (e.Attribute("name").Value)

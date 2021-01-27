@@ -438,7 +438,7 @@ namespace SWAddin
             }
             pb.End();
 
-            compsColl[0].Name2 = "Плата"; //Пререименовываем деталь      
+            compsColl[0].Name2 = board.designator+(char)32+"Плата печатная"; //Пререименовываем деталь      
             if (compsColl.Count - 1 == board.components.Count) //Проверка чтобы не сбились поз. обозначения, если появятся значит все правильно иначе они не нужны
             {
                 for (int i = 0; i < board.components.Count; i++)
