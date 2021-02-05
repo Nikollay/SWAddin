@@ -31,7 +31,7 @@ namespace SWAddin
         public const int mainItemID1 = 1;
         public const int mainItemID2 = 2;
         public const int mainItemID3 = 3;
-        public const int mainItemID4 = 4;
+        //public const int mainItemID4 = 4;
         string sAddinName = "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS PDM\\PDMSW.dll";
         #endregion
 
@@ -154,7 +154,7 @@ namespace SWAddin
         {
             ICommandGroup cmdGroup;
 
-            int cmdIndex1, cmdIndex2, cmdIndex3, cmdIndex4;
+            int cmdIndex1, cmdIndex2, cmdIndex3; //cmdIndex4;
             string Title = "Addin", ToolTip = "Addin";
 
             int cmdGroupErr = 0;
@@ -164,7 +164,7 @@ namespace SWAddin
             //get the ID information stored in the registry
             bool getDataResult = iCmdMgr.GetGroupDataFromRegistry(mainCmdGroupID, out registryIDs);
 
-            int[] knownIDs = new int[4] { mainItemID1, mainItemID2, mainItemID3, mainItemID4 };
+            int[] knownIDs = new int[3] { mainItemID1, mainItemID2, mainItemID3 }; //mainItemID4
 
             if (getDataResult)
             {
@@ -180,7 +180,7 @@ namespace SWAddin
             cmdIndex1 = cmdGroup.AddCommandItem2("Создать 3D модель платы", -1, "Создать 3D модель платы PCB", "Создать 3D модель платы PCB", -1, "Create3DPCB", "", mainItemID1, menuToolbarOption);
             cmdIndex2 = cmdGroup.AddCommandItem2("Создать XML", -1, "Создать XML из сборки", "Создать XML из сборки", -1, "GetXML", "", mainItemID2, menuToolbarOption);
             cmdIndex3 = cmdGroup.AddCommandItem2("Создать Tiff", -1, "Создать Tiff картинки чертежей", "Создать Tiff картинки чертежей", -1, "GetTiff", "", mainItemID3, menuToolbarOption);
-            cmdIndex4 = cmdGroup.AddCommandItem2("Создать XLS из XML", -1, "Создать XLS из XML", "Создать XLS из XML", -1, "GetXLS", "", mainItemID4, menuToolbarOption);
+            //cmdIndex4 = cmdGroup.AddCommandItem2("Создать XLS из XML", -1, "Создать XLS из XML", "Создать XLS из XML", -1, "GetXLS", "", mainItemID4, menuToolbarOption);
             cmdGroup.HasToolbar = true;
             cmdGroup.HasMenu = true;
             cmdGroup.Activate();
@@ -340,7 +340,9 @@ namespace SWAddin
                     sample = comp.footprint;
                     if (sample.EndsWith("N")|sample.EndsWith("M")|sample.EndsWith("L")) { sample = sample.Remove(sample.Length - 1); }   
                 }
-                comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
+                //Регистронезависимый поиск
+                comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase) != -1);
+                //comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
                 if (String.IsNullOrWhiteSpace(comp.fileName)&(board.ver != 2))
                 {
                     comp.fileName = allFoundFiles.Find(item => item.Contains(comp.part_Number));
