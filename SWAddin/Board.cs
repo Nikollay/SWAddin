@@ -8,6 +8,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using System.Globalization;
 
 namespace SWAddin
 {
@@ -37,28 +38,35 @@ namespace SWAddin
         }
         private static XDocument GetXML(string filename, Board board)
         {
-            XDocument doc = XDocument.Load(filename);
-            XElement element = (XElement)doc.Root.FirstNode;
-            switch (element.Name.ToString())
+            try
             {
-                case "transactions":
-                    board.ver = 1;
-                    return GetXML1(filename);   
-                case "transaction":
-                     if (element.Attribute("Type").Value == "SOLIDWORKS") 
-                    {
-                        board.ver = 3; 
-                        return null;// GetXML3(filename); 
-                    }
-                    else
-                    {
-                        board.ver = 2;
-                        return GetXML2(filename);
-                    }
-                default:
-                    return null;
+                XDocument doc = XDocument.Load(filename);
+                XElement element = (XElement)doc.Root.FirstNode;
+                switch (element.Name.ToString())
+                {
+                    case "transactions":
+                        board.ver = 1;
+                        return GetXML1(filename);
+                    case "transaction":
+                        if (element.Attribute("Type").Value == "SOLIDWORKS")
+                        {
+                            board.ver = 3;
+                            return null;// GetXML3(filename); 
+                        }
+                        else
+                        {
+                            board.ver = 2;
+                            return GetXML2(filename);
+                        }
+                    default:
+                        return null;
+                }
             }
-         }
+            catch
+            {
+                return null;
+            }
+        }
         private static XDocument GetXML1(string filename)
         {
             XAttribute a1, a2;
@@ -202,22 +210,22 @@ namespace SWAddin
                         component.part_Number = e.Attribute("value").Value;
                         break;
                     case "X":
-                        component.x = double.Parse(e.Attribute("value").Value) / 1000;
+                        component.x = double.Parse(e.Attribute("value").Value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                         break;
                     case "Y":
-                        component.y = double.Parse(e.Attribute("value").Value) / 1000;
+                        component.y = double.Parse(e.Attribute("value").Value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                         break;
                     case "Z":
-                        component.z = double.Parse(e.Attribute("value").Value) / 1000;
+                        component.z = double.Parse(e.Attribute("value").Value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                         break;
                     case "Layer":
-                        component.layer = int.Parse(e.Attribute("value").Value);
+                        component.layer = int.Parse(e.Attribute("value").Value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture);
                         break;
                     case "Rotation":
-                        component.rotation = double.Parse(e.Attribute("value").Value);
+                        component.rotation = double.Parse(e.Attribute("value").Value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture);
                         break;
                     case "StandOff":
-                        component.standOff = double.Parse(e.Attribute("value").Value) / 1000;
+                        component.standOff = double.Parse(e.Attribute("value").Value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                         break;
                 }
             }
@@ -248,21 +256,21 @@ namespace SWAddin
                             if (strToDbl.Length == 4)
                             {
                                 skLine = new Line();
-                                skLine.x1 = double.Parse(strToDbl[0]) / 1000;
-                                skLine.y1 = double.Parse(strToDbl[1]) / 1000;
-                                skLine.x2 = double.Parse(strToDbl[2]) / 1000;
-                                skLine.y2 = double.Parse(strToDbl[3]) / 1000;
+                                skLine.x1 = double.Parse(strToDbl[0].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skLine.y1 = double.Parse(strToDbl[1].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skLine.x2 = double.Parse(strToDbl[2].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skLine.y2 = double.Parse(strToDbl[3].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                                 board.sketh.Add(skLine);
                             }
                             if (strToDbl.Length == 9)
                             {
                                 skArc = new Arc();
-                                skArc.x1 = double.Parse(strToDbl[0]) / 1000;
-                                skArc.y1 = double.Parse(strToDbl[1]) / 1000;
-                                skArc.x2 = double.Parse(strToDbl[2]) / 1000;
-                                skArc.y2 = double.Parse(strToDbl[3]) / 1000;
-                                skArc.xc = double.Parse(strToDbl[7]) / 1000;
-                                skArc.yc = double.Parse(strToDbl[8]) / 1000;
+                                skArc.x1 = double.Parse(strToDbl[0].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.y1 = double.Parse(strToDbl[1].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.x2 = double.Parse(strToDbl[2].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.y2 = double.Parse(strToDbl[3].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.xc = double.Parse(strToDbl[7].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.yc = double.Parse(strToDbl[8].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                                 skArc.direction = 0;
                                 board.sketh.Add(skArc);
                             }
@@ -277,21 +285,21 @@ namespace SWAddin
                             if (strToDbl.Length == 4)
                             {
                                 skLine = new Line();
-                                skLine.x1 = double.Parse(strToDbl[0]) / 1000;
-                                skLine.y1 = double.Parse(strToDbl[1]) / 1000;
-                                skLine.x2 = double.Parse(strToDbl[2]) / 1000;
-                                skLine.y2 = double.Parse(strToDbl[3]) / 1000;
+                                skLine.x1 = double.Parse(strToDbl[0].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skLine.y1 = double.Parse(strToDbl[1].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skLine.x2 = double.Parse(strToDbl[2].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skLine.y2 = double.Parse(strToDbl[3].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                                 board.cutout.Add(skLine);
                             }
                             if (strToDbl.Length == 9)
                             {
                                 skArc = new Arc();
-                                skArc.x1 = double.Parse(strToDbl[0]) / 1000;
-                                skArc.y1 = double.Parse(strToDbl[1]) / 1000;
-                                skArc.x2 = double.Parse(strToDbl[2]) / 1000;
-                                skArc.y2 = double.Parse(strToDbl[3]) / 1000;
-                                skArc.xc = double.Parse(strToDbl[7]) / 1000;
-                                skArc.yc = double.Parse(strToDbl[8]) / 1000;
+                                skArc.x1 = double.Parse(strToDbl[0].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.y1 = double.Parse(strToDbl[1].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.x2 = double.Parse(strToDbl[2].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.y2 = double.Parse(strToDbl[3].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.xc = double.Parse(strToDbl[7].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skArc.yc = double.Parse(strToDbl[8].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                                 skArc.direction = 1;
                                 board.cutout.Add(skArc);
                             }
@@ -306,15 +314,15 @@ namespace SWAddin
                             if (strToDbl.Length == 4)
                             {
                                 skCircle = new Circle();
-                                skCircle.radius = double.Parse(strToDbl[0]) / 2000;
-                                skCircle.xc = double.Parse(strToDbl[1]) / 1000;
-                                skCircle.yc = double.Parse(strToDbl[2]) / 1000;
+                                skCircle.radius = double.Parse(strToDbl[0].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 2000;
+                                skCircle.xc = double.Parse(strToDbl[1].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                skCircle.yc = double.Parse(strToDbl[2].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                                 board.circles.Add(skCircle);
                             }
                         }
                         break;
                     case "Толщина, мм":
-                        board.thickness = double.Parse(e.Attribute("value").Value) / 1000;
+                        board.thickness = double.Parse(e.Attribute("value").Value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                         break;
                 }
             }
