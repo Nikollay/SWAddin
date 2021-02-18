@@ -317,11 +317,11 @@ namespace SWAddin
             value[18] = new XAttribute("value", "");
             name[19] = new XAttribute("name", "Наименование");
             value[19] = new XAttribute("value", title);
-            name[20] = new XAttribute("name", "Литера1");
+            name[20] = new XAttribute("name", "Литера 1");
             value[20] = new XAttribute("value", "");
-            name[21] = new XAttribute("name", "Литера2");
+            name[21] = new XAttribute("name", "Литера 2");
             value[21] = new XAttribute("value", "");
-            name[22] = new XAttribute("name", "Литера3");
+            name[22] = new XAttribute("name", "Литера 3");
             value[22] = new XAttribute("value", "");
             name[23] = new XAttribute("name", "Код документа");
             value[23] = new XAttribute("value", "");
