@@ -339,5 +339,73 @@ namespace SWAddin
             }
             return graphs;
         }
+        public static XElement GetDocuments(AssemblyDoc swAssy)
+        {
+            XAttribute[] name, value;
+            name = new XAttribute[15];
+            value = new XAttribute[15];
+            XElement property, properties, document, documents;
+            properties = new XElement("properties");
+            document = new XElement("document");
+            documents = new XElement("documents");
+
+            string title;
+
+            ModelDoc2 swModel;
+            CustomPropertyManager prpMgr;
+            ModelDocExtension swModelDocExt;
+            ConfigurationManager confManager;
+            string configuration;
+
+            swModel = (ModelDoc2)swAssy;
+
+            confManager = (ConfigurationManager)swModel.ConfigurationManager;
+            configuration = confManager.ActiveConfiguration.Name;
+            swModelDocExt = swModel.Extension;
+            prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
+            prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
+            title = valOut;
+            
+
+            name[0] = new XAttribute("name", "Раздел СП");
+            value[0] = new XAttribute("value", "Документация");
+            name[1] = new XAttribute("name", "Наименование");
+            value[1] = new XAttribute("value", "Сборочный чертеж");
+            name[2] = new XAttribute("name", "Обозначение");
+            value[2] = new XAttribute("value", title + "СБ");
+            name[3] = new XAttribute("name", "Код продукции");
+            value[3] = new XAttribute("value", "");
+            name[4] = new XAttribute("name", "Формат");
+            value[4] = new XAttribute("value", "A3");
+            name[5] = new XAttribute("name", "Документ на поставку");
+            value[5] = new XAttribute("value", "");
+            name[6] = new XAttribute("name", "Поставщик");
+            value[6] = new XAttribute("value", "");
+            name[7] = new XAttribute("name", "Количество на изд.");
+            value[7] = new XAttribute("value", "1");
+            name[8] = new XAttribute("name", "Количество в комп.");
+            value[8] = new XAttribute("value", "");
+            name[9] = new XAttribute("name", "Количество на рег.к");
+            value[9] = new XAttribute("value", "");
+            name[10] = new XAttribute("name", "Количество");
+            value[10] = new XAttribute("value", "");
+            name[11] = new XAttribute("name", "Примечание");
+            value[11] = new XAttribute("value", "");
+            name[12] = new XAttribute("name", "Зона");
+            value[12] = new XAttribute("value", "");
+            name[13] = new XAttribute("name", "Позиция");
+            value[13] = new XAttribute("value", "");
+            name[14] = new XAttribute("name", "Куда входит");
+            value[14] = new XAttribute("value", title);
+           
+            for (int i = 0; i < name.Length; i++)
+            {
+                property = new XElement("property", name[i], value[i]);
+                properties.Add(property);
+            }
+            document.Add(properties);
+            documents.Add(document);
+            return documents;
+        }
     }
 }

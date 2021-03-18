@@ -470,7 +470,7 @@ namespace SWAddin
             AssemblyDoc swAssy;
             List<Comp> coll;
             XDocument doc;
-            XElement xml, transaction, project, configurations, configuration, components, component;
+            XElement xml, transaction, project, configurations, configuration, documents, components, component;
 
             int errors = 0;
             int warnings = 0;
@@ -528,6 +528,7 @@ namespace SWAddin
                 configuration = new XElement("configuration", new XAttribute("name", f.conf[i]));
                 coll = Comp.GetColl((SldWorks)iSwApp);
                 //iSwApp.SendMsgToUser2("Всего " + coll.Count, 2, 2);
+                documents= Comp.GetDocuments(swAssy);
                 components = new XElement("components");
                 foreach (Comp k in coll)
                 {
@@ -535,10 +536,12 @@ namespace SWAddin
                     components.Add(component);
                 }
                 if (i == 0) { configuration.Add(Comp.GetGraphs(swAssy)); }
+                configuration.Add(documents);
                 configuration.Add(components);
                 configurations.Add(configuration);
                 //swModel.ShowConfiguration2(f.conf[0]);
             }
+
             project.Add(configurations);
             transaction.Add(project);
             xml.Add(transaction);
