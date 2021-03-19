@@ -652,7 +652,7 @@ namespace SWAddin
 
             //Сохраняем картинки
             int itogo = 0;
-
+            StreamWriter writer = new StreamWriter(projekt_path + "TIF\\" + "Список" + ".txt", false);
             foreach (KeyValuePair<string, string> k in Drw)
             {
                 //Настройка размеров картинки
@@ -666,11 +666,13 @@ namespace SWAddin
                     swModel = (ModelDoc2)Part;
                     swModelDocExt = (ModelDocExtension)swModel.Extension;
                     swModelDocExt.SaveAs2(projekt_path + "TIF\\" + k.Key + ".TIF", (int)swSaveAsVersion_e.swSaveAsCurrentVersion, (int)swSaveAsOptions_e.swSaveAsOptions_Silent,  null, "", false, ref errors, ref warnings);
+                    writer.WriteLine(k.Value.Substring(k.Value.LastIndexOf((char)92) + 1));
                     itogo += 1;
                 }
                 iSwApp.CloseDoc(k.Value + ".SLDDRW");
                 Part = null;
             }
+            writer.Close();
             iSwApp.LoadAddIn(sAddinName);
             iSwApp.SendMsgToUser2("Всего частей " + Dict.Count + System.Environment.NewLine + "Чертежей сохранено " + itogo, 2, 2);
             //iSwApp.CommandInProgress = false;
