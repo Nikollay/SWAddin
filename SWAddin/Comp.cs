@@ -84,10 +84,16 @@ namespace SWAddin
                     prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
                     prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
                     component.used = valOut;
-
+               
                     comp = (Component2)comps[i];
+                //проверка компонента
+                    if (comp == null)
+                    {
+                        swApp.SendMsgToUser2("Не могу загрузить " + comp.Name2, 4, 2);
+                        continue;
+                    }
                     path = comp.GetPathName();
-                    if ((comp.GetSuppression() != (int)swComponentSuppressionState_e.swComponentSuppressed) & (comps[i] != null))
+                    if ((comp.GetSuppression() != (int)swComponentSuppressionState_e.swComponentSuppressed) & (comp != null))//comps[i] != null
                     {
 
                         aTrans = (double[])comp.Transform2.ArrayData;
