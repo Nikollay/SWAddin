@@ -378,7 +378,7 @@ namespace SWAddin
             name[1] = new XAttribute("name", "Наименование");
             value[1] = new XAttribute("value", "Сборочный чертеж");
             name[2] = new XAttribute("name", "Обозначение");
-            value[2] = new XAttribute("value", title + "СБ");
+            value[2] = new XAttribute("value", title.Substring(0,15) + "СБ");
             name[3] = new XAttribute("name", "Код продукции");
             value[3] = new XAttribute("value", "");
             name[4] = new XAttribute("name", "Формат");
