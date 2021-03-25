@@ -582,6 +582,7 @@ namespace SWAddin
                 }
                 swModel = (ModelDoc2)iSwApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
             }
+
             iSwApp.UnloadAddIn(sAddinName);
             //Проверяем открыта сборка или нет
             if ((swModel.GetType() != 2) | (swModel == null))
@@ -591,37 +592,53 @@ namespace SWAddin
                 return;
             }
 
+            //FileAttributes attr = File.GetAttributes(@"c:\Temp");
+            //attr.HasFlag(FileAttributes.Directory); // файл или дирректория
             //swModel = (ModelDoc2)swApp.ActiveDoc;
-            
+
             swAssy = (AssemblyDoc)swModel;
             Dict = new Dictionary<string, string>();
             projekt_path = swModel.GetPathName().Remove(swModel.GetPathName().LastIndexOf((char)92) + 1);
 
-            key = swModel.GetPathName().Substring(swModel.GetPathName().LastIndexOf((char)92) + 1);
-            key = key.Substring(0, key.Length - 7);
-            pathName = swModel.GetPathName();
-            pathName = pathName.Remove(pathName.Length - 7);
-            Dict.Add(key, pathName);
-
-            //Создаем список путей компонентов для всех конфигураций
-            сonfNames = (string[])swModel.GetConfigurationNames();
-            swAssy.ResolveAllLightWeightComponents(false);
-            for (int i = 0; i < сonfNames.Length; i++)
+            int value = iSwApp.SendMsgToUser2("Создать Tiff со всей сборки(Да) или только с её папки(нет)?", 3, 5);
+            if (value == 3)
             {
-                swModel.ShowConfiguration2((string)сonfNames[i]);
-                swModel.ForceRebuild3(false);
-                Comps = (Object[])swAssy.GetComponents(false);
-                for (int j = 0; j < Comps.Length; j++)
+                List<string> allDRW = new List<string>(Directory.GetFiles(projekt_path, "*.SLDDRW", SearchOption.AllDirectories));
+                foreach (String pdrw in allDRW)
                 {
-                    swComp = (Component2)Comps[j];
-                    //compDoc = (ModelDoc2)swComp.GetModelDoc2();
-                    if ((swComp.GetSuppression() != (int)swComponentSuppressionState_e.swComponentSuppressed) & (swComp != null))
+                    key = pdrw.Substring(pdrw.LastIndexOf((char)92) + 1);
+                    key = key.Substring(0, key.Length - 7);
+                    Dict.Add(key, pdrw.Substring(0, pdrw.Length - 7));
+                }
+            }
+            else
+            {
+                key = swModel.GetPathName().Substring(swModel.GetPathName().LastIndexOf((char)92) + 1);
+                key = key.Substring(0, key.Length - 7);
+                pathName = swModel.GetPathName();
+                pathName = pathName.Remove(pathName.Length - 7);
+                Dict.Add(key, pathName);
+
+                //Создаем список путей компонентов для всех конфигураций
+                сonfNames = (string[])swModel.GetConfigurationNames();
+                swAssy.ResolveAllLightWeightComponents(false);
+                for (int i = 0; i < сonfNames.Length; i++)
+                {
+                    swModel.ShowConfiguration2((string)сonfNames[i]);
+                    swModel.ForceRebuild3(false);
+                    Comps = (Object[])swAssy.GetComponents(false);
+                    for (int j = 0; j < Comps.Length; j++)
                     {
-                        pathName = swComp.GetPathName();
-                        pathName = pathName.Remove(pathName.Length - 7);
-                        key = swComp.GetPathName().Substring(swComp.GetPathName().LastIndexOf((char)92) + 1);
-                        key = key.Substring(0, key.Length - 7);
-                        if (!Dict.ContainsKey(key)) { Dict.Add(key, pathName); }
+                        swComp = (Component2)Comps[j];
+                        //compDoc = (ModelDoc2)swComp.GetModelDoc2();
+                        if ((swComp.GetSuppression() != (int)swComponentSuppressionState_e.swComponentSuppressed) & (swComp != null))
+                        {
+                            pathName = swComp.GetPathName();
+                            pathName = pathName.Remove(pathName.Length - 7);
+                            key = swComp.GetPathName().Substring(swComp.GetPathName().LastIndexOf((char)92) + 1);
+                            key = key.Substring(0, key.Length - 7);
+                            if (!Dict.ContainsKey(key)) { Dict.Add(key, pathName); }
+                        }
                     }
                 }
             }
@@ -653,6 +670,7 @@ namespace SWAddin
             //Сохраняем картинки
             int itogo = 0;
             StreamWriter writer = new StreamWriter(projekt_path + "TIF\\" + "Список" + ".txt", false);
+
             foreach (KeyValuePair<string, string> k in Drw)
             {
                 //Настройка размеров картинки
