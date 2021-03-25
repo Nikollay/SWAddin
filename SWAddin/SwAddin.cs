@@ -611,7 +611,7 @@ namespace SWAddin
                     Dict.Add(key, pdrw.Substring(0, pdrw.Length - 7));
                 }
             }
-            else
+            else if (value == 6)
             {
                 key = swModel.GetPathName().Substring(swModel.GetPathName().LastIndexOf((char)92) + 1);
                 key = key.Substring(0, key.Length - 7);
@@ -642,12 +642,20 @@ namespace SWAddin
                     }
                 }
             }
-            
+            else { return; }
+
             //Находим где могут быть чертежи
             Drw = new Dictionary<string, string>();
             foreach (KeyValuePair<string, string> k in Dict)
             {
-                if ((k.Value.Contains((string)"D:\\PDM\\Проект")) | (k.Value.Contains("D:\\PDM\\Общеприменяемые")))
+                if (value == 6)
+                {
+                    if ((k.Value.Contains((string)"D:\\PDM\\Проект")) | (k.Value.Contains("D:\\PDM\\Общеприменяемые")))
+                    {
+                        Drw.Add(k.Key, k.Value);
+                    }
+                }
+                else
                 {
                     Drw.Add(k.Key, k.Value);
                 }
