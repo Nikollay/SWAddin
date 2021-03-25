@@ -583,7 +583,6 @@ namespace SWAddin
                 swModel = (ModelDoc2)iSwApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
             }
 
-            iSwApp.UnloadAddIn(sAddinName);
             //Проверяем открыта сборка или нет
             if ((swModel.GetType() != 2) | (swModel == null))
             {
@@ -595,12 +594,13 @@ namespace SWAddin
             //FileAttributes attr = File.GetAttributes(@"c:\Temp");
             //attr.HasFlag(FileAttributes.Directory); // файл или дирректория
             //swModel = (ModelDoc2)swApp.ActiveDoc;
-
+            
             swAssy = (AssemblyDoc)swModel;
             Dict = new Dictionary<string, string>();
             projekt_path = swModel.GetPathName().Remove(swModel.GetPathName().LastIndexOf((char)92) + 1);
 
             int value = iSwApp.SendMsgToUser2("Создать Tiff со всей сборки(Да) или только с её папки(нет)?", 3, 5);
+            iSwApp.UnloadAddIn(sAddinName);
             if (value == 3)
             {
                 List<string> allDRW = new List<string>(Directory.GetFiles(projekt_path, "*.SLDDRW", SearchOption.AllDirectories));
@@ -642,7 +642,7 @@ namespace SWAddin
                     }
                 }
             }
-            else { return; }
+            else { iSwApp.LoadAddIn(sAddinName); return; }
 
             //Находим где могут быть чертежи
             Drw = new Dictionary<string, string>();
