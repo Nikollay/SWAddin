@@ -83,10 +83,10 @@ namespace SWAddin
                     configuration = confManager.ActiveConfiguration.Name;
                     prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
                     prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
-                    component.used = valOut;
+                    component.used = valOut.Trim();
                
                     comp = (Component2)comps[i];
-                //проверка компонента
+                    //проверка компонента
                     if (comp == null)
                     {
                         swApp.SendMsgToUser2("Не могу загрузить " + comp.Name2, 4, 2);
@@ -122,16 +122,20 @@ namespace SWAddin
                         component.note = valOut;
                         prpMgr.Get6("Раздел", true, out valOut, out _, out _, out _);
                         component.chapter = valOut;
-                        prpMgr.Get6("Перв.Примен.", true, out valOut, out _, out _, out _);
-                        component.included = valOut;
+                        if (component.chapter == "Сборочные единицы") { prpMgr.Get6("Перв. примен.", true, out valOut, out _, out _, out _); }
+                        if (component.chapter == "Детали") { prpMgr.Get6("Перв.примен.", true, out valOut, out _, out _, out _); }
+                        else { valOut = ""; }
+                        component.included = valOut.Trim();
 
                         //Примечание заим.
-                        if (!component.used.Contains(component.included))
+                        if ((component.chapter == "Сборочные единицы") | (component.chapter == "Детали"))
                         {
-                            if (String.IsNullOrEmpty(component.note)) { component.note = component.included.Substring(6); }
-                            else if(component.note.ToLower().Contains("общеприм")) { }
-                            else { component.note = component.note + (char)32 + component.included.Substring(6); }
-
+                            if (!component.used.Contains(component.included))
+                            {
+                            if (String.IsNullOrEmpty(component.note)) { component.note = component.included.Substring(5); }
+                            else if (component.note.ToLower().Contains("общеприм")) { }
+                            else { component.note = component.note + (char)32 + component.included.Substring(5); }
+                            }
                         }
 
                         if ((component.chapter == "Стандартные изделия") | (component.chapter == "Прочие изделия"))
