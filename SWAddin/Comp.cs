@@ -126,7 +126,7 @@ namespace SWAddin
                         component.included = valOut;
 
                         //Примечание заим.
-                        if (!component.used.Equals(component.included))
+                        if (!component.used.Contains(component.included))
                         {
                             if (String.IsNullOrEmpty(component.note)) { component.note = component.included.Substring(6); }
                             else if(component.note.ToLower().Contains("общеприм")) { }
