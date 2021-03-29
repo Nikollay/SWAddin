@@ -125,6 +125,15 @@ namespace SWAddin
                         prpMgr.Get6("Перв.Примен.", true, out valOut, out _, out _, out _);
                         component.included = valOut;
 
+                        //Примечание заим.
+                        if (!component.used.Equals(component.included))
+                        {
+                            if (String.IsNullOrEmpty(component.note)) { component.note = component.included.Substring(6); }
+                            else if(component.note.ToLower().Contains("общеприм")) { }
+                            else { component.note = component.note + (char)32 + component.included.Substring(6); }
+
+                        }
+
                         if ((component.chapter == "Стандартные изделия") | (component.chapter == "Прочие изделия"))
                         {
                             prpMgr.Get6("Документ на поставку", true, out valOut, out _, out _, out _);
