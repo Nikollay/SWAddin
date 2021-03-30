@@ -587,37 +587,44 @@ namespace SWAddin
             if ((swModel.GetType() != 2) | (swModel == null))
             {
                 iSwApp.SendMsgToUser2("Откройте сборку", 4, 2);
-                
+
                 return;
             }
 
             //FileAttributes attr = File.GetAttributes(@"c:\Temp");
             //attr.HasFlag(FileAttributes.Directory); // файл или дирректория
             //swModel = (ModelDoc2)swApp.ActiveDoc;
-            
+
             swAssy = (AssemblyDoc)swModel;
             Dict = new Dictionary<string, string>();
             projekt_path = swModel.GetPathName().Remove(swModel.GetPathName().LastIndexOf((char)92) + 1);
 
             int value = iSwApp.SendMsgToUser2("Создать Tiff со всей сборки(Да) или только с её папки(нет)?", 3, 5);
             iSwApp.UnloadAddIn(sAddinName);
-            if (value == 3)
+            //iSwApp.SendMsgToUser2("Значение "+ value, 4, 2);
+        switch (value)
+        {
+            case 3:
             {
                 List<string> allDRW = new List<string>(Directory.GetFiles(projekt_path, "*.SLDDRW", SearchOption.AllDirectories));
+                //iSwApp.SendMsgToUser2("Длина " + allDRW.Count, 4, 2);
+
                 foreach (String pdrw in allDRW)
                 {
                     key = pdrw.Substring(pdrw.LastIndexOf((char)92) + 1);
                     key = key.Substring(0, key.Length - 7);
-                    Dict.Add(key, pdrw.Substring(0, pdrw.Length - 7));
+                    if (!Dict.ContainsKey(key)) { Dict.Add(key, pdrw.Substring(0, pdrw.Length - 7)); }                    
                 }
+
+            break;
             }
-            else if (value == 6)
+            case 6:
             {
                 key = swModel.GetPathName().Substring(swModel.GetPathName().LastIndexOf((char)92) + 1);
                 key = key.Substring(0, key.Length - 7);
                 pathName = swModel.GetPathName();
                 pathName = pathName.Remove(pathName.Length - 7);
-                Dict.Add(key, pathName);
+                if (!Dict.ContainsKey(key)) { Dict.Add(key, pathName); }              
 
                 //Создаем список путей компонентов для всех конфигураций
                 сonfNames = (string[])swModel.GetConfigurationNames();
@@ -641,9 +648,14 @@ namespace SWAddin
                         }
                     }
                 }
+            break;
             }
-            else { iSwApp.LoadAddIn(sAddinName); return; }
-
+            default:
+            {
+            iSwApp.LoadAddIn(sAddinName);
+            return; 
+            }
+        }
             //Находим где могут быть чертежи
             Drw = new Dictionary<string, string>();
             foreach (KeyValuePair<string, string> k in Dict)
