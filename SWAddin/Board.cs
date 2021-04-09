@@ -271,7 +271,11 @@ namespace SWAddin
                                 skArc.y2 = double.Parse(strToDbl[3].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                                 skArc.xc = double.Parse(strToDbl[7].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
                                 skArc.yc = double.Parse(strToDbl[8].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
-                                skArc.direction = 0;
+                                skArc.a1 = double.Parse(strToDbl[4].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture);
+                                skArc.a2 = double.Parse(strToDbl[5].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture);
+                                skArc.r = double.Parse(strToDbl[6].Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), CultureInfo.InvariantCulture) / 1000;
+                                if (skArc.a1 < skArc.a2) { skArc.direction = 1; }
+                                else { skArc.direction = -1; }
                                 board.sketh.Add(skArc);
                             }
                         }

@@ -8,7 +8,7 @@ namespace SWAddin
 {
     class Arc
     {
-        public short direction=1;
-        public double xc, yc, x1, x2, y1, y2;
+        public short direction;
+        public double xc, yc, x1, x2, y1, y2, a1, a2, r;
     }
 }

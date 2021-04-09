@@ -338,7 +338,8 @@ namespace SWAddin
                 if (board.ver==2) 
                 {
                     sample = comp.footprint;
-                    if (sample.EndsWith("N")|sample.EndsWith("M")|sample.EndsWith("L")) { sample = sample.Remove(sample.Length - 1); }   
+                    if (sample.EndsWith("N")|sample.EndsWith("M")|sample.EndsWith("L")) { sample = sample.Remove(sample.Length - 1); }
+                    if (sample.EndsWith("DN") | sample.EndsWith("DM") | sample.EndsWith("DL")) { sample = sample.Remove(sample.Length - 2); }
                 }
                 //Регистронезависимый поиск
                 comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase) != -1);
