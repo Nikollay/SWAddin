@@ -69,8 +69,7 @@ namespace SWAddin
             swAssy = (AssemblyDoc)swApp.ActiveDoc;
             swAssy.ResolveAllLightWeightComponents(false);
             comps = (object[])swAssy.GetComponents(true);
-            
-            
+ 
             for (int i = 0; i < comps.Length; i++)
             {
                            
@@ -100,8 +99,8 @@ namespace SWAddin
                         if (path.ToUpper().EndsWith(".SLDASM")) { docType = (swDocumentTypes_e)swDocumentTypes_e.swDocASSEMBLY; }
                         if (path.ToUpper().EndsWith(".SLDPRT")) { docType = (swDocumentTypes_e)swDocumentTypes_e.swDocPART; }
                         int errs = 0, wrns = 0;
-                        compDoc = swApp.OpenDoc6(path, (int)docType, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errs, ref wrns);
-                        if (compDoc == null) { compDoc = (ModelDoc2)comp.GetModelDoc2(); }
+                        compDoc = (ModelDoc2)comp.GetModelDoc2();
+                        if (compDoc == null) { compDoc = swApp.OpenDoc6(path, (int)docType, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errs, ref wrns); }
                         if (compDoc == null)
                         {
                             swApp.SendMsgToUser2("Не могу загрузить " + path, 4, 2);
@@ -111,7 +110,13 @@ namespace SWAddin
                         configuration = (string)comp.ReferencedConfiguration;
                         swModelDocExt = (ModelDocExtension)compDoc.Extension;
                         prpMgr = (CustomPropertyManager)swModelDocExt.get_CustomPropertyManager(configuration);
-
+                        if (prpMgr == null)
+                        {
+                        swApp.SendMsgToUser2("Не могу загрузить " + comp.Name2, 4, 2);
+                        swApp.ExitApp();
+                        System.Environment.Exit(0);
+                        //continue;
+                        }
                         prpMgr.Get6("Формат", true, out valOut, out _, out _, out _);
                         component.format = valOut;
                         prpMgr.Get6("Обозначение", true, out valOut, out _, out _, out _);
@@ -155,6 +160,7 @@ namespace SWAddin
                     }
                 
             }
+            //swApp.SendMsgToUser2("Вышло " + coll.Count, 4, 2);
 
             foreach (Comp k in coll)
             {
@@ -367,7 +373,6 @@ namespace SWAddin
             properties = new XElement("properties");
             document = new XElement("document");
             documents = new XElement("documents");
-
             string title;
 
             ModelDoc2 swModel;
@@ -375,7 +380,6 @@ namespace SWAddin
             ModelDocExtension swModelDocExt;
             ConfigurationManager confManager;
             string configuration;
-
             swModel = (ModelDoc2)swAssy;
 
             confManager = (ConfigurationManager)swModel.ConfigurationManager;
@@ -384,14 +388,12 @@ namespace SWAddin
             prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
             prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
             title = valOut;
-            
-
             name[0] = new XAttribute("name", "Раздел СП");
             value[0] = new XAttribute("value", "Документация");
             name[1] = new XAttribute("name", "Наименование");
             value[1] = new XAttribute("value", "Сборочный чертеж");
             name[2] = new XAttribute("name", "Обозначение");
-            value[2] = new XAttribute("value", title.Substring(0,15) + "СБ");
+            value[2] = new XAttribute("value", title + "СБ");
             name[3] = new XAttribute("name", "Код продукции");
             value[3] = new XAttribute("value", "");
             name[4] = new XAttribute("name", "Формат");

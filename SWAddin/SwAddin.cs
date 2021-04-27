@@ -529,7 +529,7 @@ namespace SWAddin
                 configuration = new XElement("configuration", new XAttribute("name", f.conf[i]));
                 coll = Comp.GetColl((SldWorks)iSwApp);
                 //iSwApp.SendMsgToUser2("Всего " + coll.Count, 2, 2);
-                documents= Comp.GetDocuments(swAssy);
+                documents = Comp.GetDocuments(swAssy);
                 components = new XElement("components");
                 foreach (Comp k in coll)
                 {
@@ -548,6 +548,7 @@ namespace SWAddin
             xml.Add(transaction);
             doc.Add(xml);
             path = fileName.Substring(0, fileName.Length - 7) + ".xml";
+            //iSwApp.SendMsgToUser2(path, 4, 2);
             iSwApp.LoadAddIn(sAddinName);
             doc.Save(path);
             //iSwApp.CommandInProgress = false;
