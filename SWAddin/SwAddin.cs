@@ -334,10 +334,12 @@ namespace SWAddin
             {
                 //Выбор по какому полю искать 3Д модель
                 //sample = comp.part_Number;
-                sample = comp.title;
+                sample = comp.title.Replace((char)47, (char)95);
+                sample = sample.Replace((char)92, (char)95);
                 if (board.ver==2) 
                 {
-                    sample = comp.footprint;
+                    sample = comp.footprint.Replace((char)47, (char)95);
+                    sample = sample.Replace((char)92, (char)95);
                     if (sample.EndsWith("N")|sample.EndsWith("M")|sample.EndsWith("L")) { sample = sample.Remove(sample.Length - 1); }
                     if (sample.EndsWith("DN") | sample.EndsWith("DM") | sample.EndsWith("DL")) { sample = sample.Remove(sample.Length - 2); }
                 }
@@ -346,8 +348,11 @@ namespace SWAddin
                 //comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
                 if (String.IsNullOrWhiteSpace(comp.fileName)&(board.ver != 2))
                 {
-                    comp.fileName = allFoundFiles.Find(item => item.Contains(comp.part_Number));
+                    sample = comp.part_Number.Replace((char)47, (char)95);
+                    sample = sample.Replace((char)92, (char)95);
+                    comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase) != -1);
                 }
+                
                 if (String.IsNullOrWhiteSpace(comp.fileName))
                 {
                     comp.fileName = "D:\\PDM\\Прочие изделия\\ЭРИ\\Zero.SLDPRT";
@@ -601,7 +606,7 @@ namespace SWAddin
             Dict = new Dictionary<string, string>();
             projekt_path = swModel.GetPathName().Remove(swModel.GetPathName().LastIndexOf((char)92) + 1);
 
-            int value = iSwApp.SendMsgToUser2("Создать Tiff со всей сборки(Да) или только с её папки(нет)?", 3, 5);
+            int value = iSwApp.SendMsgToUser2("Создать Tiff со всей сборки(Да) или только с её папки(Нет)?", 3, 5);
             iSwApp.UnloadAddIn(sAddinName);
             //iSwApp.SendMsgToUser2("Значение "+ value, 4, 2);
         switch (value)
