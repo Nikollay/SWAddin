@@ -340,7 +340,7 @@ namespace SWAddin
                 {
                     sample = comp.footprint.Replace((char)47, (char)95);
                     sample = sample.Replace((char)92, (char)95);
-                    if (sample.EndsWith("N")|sample.EndsWith("M")|sample.EndsWith("L")) { sample = sample.Remove(sample.Length - 1); }
+                    if ((sample.EndsWith("N")&!sample.EndsWith("DN")) | (sample.EndsWith("M")&!sample.EndsWith("DM"))| (sample.EndsWith("L")&!sample.EndsWith("DL"))) { sample = sample.Remove(sample.Length - 1); } 
                     if (sample.EndsWith("DN") | sample.EndsWith("DM") | sample.EndsWith("DL")) { sample = sample.Remove(sample.Length - 2); }
                 }
                 //Регистронезависимый поиск
