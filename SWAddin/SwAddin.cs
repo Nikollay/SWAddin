@@ -226,7 +226,7 @@ namespace SWAddin
             Board board;
             string filename;
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _); //Board.GetFilename();
-            if (String.IsNullOrWhiteSpace(filename)) { return; }
+            if (string.IsNullOrWhiteSpace(filename)) { return; }
             board = Board.GetfromXML(filename);
             if (board == null) { MessageBox.Show("XML с неверной структурой","Ошибка чтения файла"); return; }
             ModelDoc2 swModel;
@@ -274,7 +274,7 @@ namespace SWAddin
 
             //Эскизы
             swModel.SketchManager.DisplayWhenAdded = false;
-            foreach (Object skt in board.sketh)
+            foreach (object skt in board.sketh)
             {
                 if (skt.GetType().FullName == "SWAddin.Line") { Line sk = (Line)skt; swModel.SketchManager.CreateLine(sk.x1, sk.y1, 0, sk.x2, sk.y2, 0); }
                 if (skt.GetType().FullName == "SWAddin.Arc") { Arc sk = (Arc)skt; swModel.SketchManager.CreateArc(sk.xc, sk.yc, 0, sk.x1, sk.y1, 0, sk.x2, sk.y2, 0, sk.direction); }
@@ -287,7 +287,7 @@ namespace SWAddin
                 plane.Select2(false, -1);
                 swModel.SketchManager.InsertSketch(false);
                 swModel.SketchManager.AddToDB = true;
-                foreach (Object skt in board.cutout)
+                foreach (object skt in board.cutout)
                 {
                     if (skt.GetType().FullName == "SWAddin.Line") { Line sk = (Line)skt; swModel.SketchManager.CreateLine(sk.x1, sk.y1, 0, sk.x2, sk.y2, 0); }
                     if (skt.GetType().FullName == "SWAddin.Arc") { Arc sk = (Arc)skt; swModel.SketchManager.CreateArc(sk.xc, sk.yc, 0, sk.x1, sk.y1, 0, sk.x2, sk.y2, 0, sk.direction); }
@@ -328,14 +328,18 @@ namespace SWAddin
                     break;
             }
             List<string> allFoundFiles = new List<string>(Directory.GetFiles(path, "*.SLD*", SearchOption.AllDirectories));
+            List<string> allFind;
             Dictionary<string, string> empty = new Dictionary<string, string>();
-                        
+            Dictionary<string, string> hollow = new Dictionary<string, string>();
+            Dictionary<string, string> multiple = new Dictionary<string, string>();
+
             foreach (Component comp in board.components)
             {
                 //Выбор по какому полю искать 3Д модель
                 //sample = comp.part_Number;
                 sample = comp.title.Replace((char)47, (char)95);
                 sample = sample.Replace((char)92, (char)95);
+                
                 if (board.ver==2) 
                 {
                     sample = comp.footprint.Replace((char)47, (char)95);
@@ -343,17 +347,22 @@ namespace SWAddin
                     if ((sample.EndsWith("N")&!sample.EndsWith("DN")) | (sample.EndsWith("M")&!sample.EndsWith("DM"))| (sample.EndsWith("L")&!sample.EndsWith("DL"))) { sample = sample.Remove(sample.Length - 1); } 
                     if (sample.EndsWith("DN") | sample.EndsWith("DM") | sample.EndsWith("DL")) { sample = sample.Remove(sample.Length - 2); }
                 }
+                //Ищем пустые футпринты
+                if (string.IsNullOrEmpty(sample)) { if (!hollow.ContainsKey(comp.title)) { hollow.Add(comp.title, comp.title); } }
+                //Ищем повторы
+                allFind = allFoundFiles.FindAll(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase)!= -1);
+                if (allFind.Count>1) { if (!multiple.ContainsKey(comp.title)) { multiple.Add(comp.title, comp.title); } }
                 //Регистронезависимый поиск
-                comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase) != -1);
+                comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase)!= -1);
                 //comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
-                if (String.IsNullOrWhiteSpace(comp.fileName)&(board.ver != 2))
+                if (string.IsNullOrWhiteSpace(comp.fileName)&(board.ver != 2))
                 {
                     sample = comp.part_Number.Replace((char)47, (char)95);
                     sample = sample.Replace((char)92, (char)95);
-                    comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase) != -1);
+                    comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase)!= -1);
                 }
                 
-                if (String.IsNullOrWhiteSpace(comp.fileName))
+                if (string.IsNullOrWhiteSpace(comp.fileName))
                 {
                     comp.fileName = "D:\\PDM\\Прочие изделия\\ЭРИ\\Zero.SLDPRT";
                     if (!empty.ContainsKey(sample)) { empty.Add(sample, sample); }
@@ -457,12 +466,27 @@ namespace SWAddin
             
             iSwApp.LoadAddIn(sAddinName);
 
-            if (empty.Count != 0)
+            if (empty.Count != 0| hollow.Count != 0 | multiple.Count != 0)
             {
-                StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 3) + "txt", false);
-                foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Value + System.Environment.NewLine; writer.WriteLine(str.Value); }
-                writer.Close();
-                MessageBox.Show(estr, "Не найдены");
+                if (empty.Count != 0)
+                {
+                    estr = "Отсутствуют 3d модели футпринтов"+System.Environment.NewLine;
+                    StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 3) + "txt", false);
+                    foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Value + System.Environment.NewLine; writer.WriteLine(str.Value); }
+                    writer.Close();
+                }
+                if (hollow.Count != 0)
+                {
+                    estr = estr + "У этих компонентов пустые строки футпринтов" + System.Environment.NewLine;
+                    foreach (KeyValuePair<string, string> str in hollow) { estr = estr + str.Value + System.Environment.NewLine; }
+                }
+                if (multiple.Count != 0)
+                {
+                    estr = estr + "Найдено несколько футпринтов этих компонентов" + System.Environment.NewLine;
+                    foreach (KeyValuePair<string, string> str in multiple) { estr = estr + str.Value + System.Environment.NewLine; }
+                }
+
+                MessageBox.Show(estr, "Внимание");
                 //swApp.SendMsgToUser2("Не найдены" + estr, 2, 2);
             }
             //iSwApp.CommandInProgress = false;
@@ -616,7 +640,7 @@ namespace SWAddin
                 List<string> allDRW = new List<string>(Directory.GetFiles(projekt_path, "*.SLDDRW", SearchOption.AllDirectories));
                 //iSwApp.SendMsgToUser2("Длина " + allDRW.Count, 4, 2);
 
-                foreach (String pdrw in allDRW)
+                foreach (string pdrw in allDRW)
                 {
                     key = pdrw.Substring(pdrw.LastIndexOf((char)92) + 1);
                     key = key.Substring(0, key.Length - 7);
@@ -640,7 +664,7 @@ namespace SWAddin
                 {
                     swModel.ShowConfiguration2((string)сonfNames[i]);
                     swModel.ForceRebuild3(false);
-                    Comps = (Object[])swAssy.GetComponents(false);
+                    Comps = (object[])swAssy.GetComponents(false);
                     for (int j = 0; j < Comps.Length; j++)
                     {
                         swComp = (Component2)Comps[j];
@@ -727,7 +751,7 @@ namespace SWAddin
             //MessageBox.Show("ДА");
             string filename;
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _);
-            if (String.IsNullOrWhiteSpace(filename)) { return; }
+            if (string.IsNullOrWhiteSpace(filename)) { return; }
 
             Excel.Application xlApp = new Excel.Application();
             xlApp.Visible = false;

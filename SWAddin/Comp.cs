@@ -137,7 +137,7 @@ namespace SWAddin
                         {
                             if (!component.used.Contains(component.included))
                             {
-                            if (String.IsNullOrEmpty(component.note)) { component.note = component.included.Substring(5); }
+                            if (string.IsNullOrEmpty(component.note)) { component.note = component.included.Substring(5); }
                             else if (component.note.ToLower().Contains("общеприм")) { }
                             else { component.note = component.note + (char)32 + component.included.Substring(5); }
                             }

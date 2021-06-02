@@ -17,7 +17,7 @@ namespace SWAddin
         public List<Component> components;
         public List<Circle> circles;
         //public List<Point> point;
-        public List<Object> sketh, cutout;
+        public List<object> sketh, cutout;
         public double thickness;
         public int ver;
         public string designator;
@@ -342,7 +342,7 @@ namespace SWAddin
             fileDialog.Title = "Открыть файл";
             fileDialog.ShowDialog();
             filename = fileDialog.FileName;
-            if (String.IsNullOrWhiteSpace(filename)) { System.Environment.Exit(0); }
+            if (string.IsNullOrWhiteSpace(filename)) { System.Environment.Exit(0); }
             return filename;
         }
 
