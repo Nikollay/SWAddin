@@ -351,7 +351,7 @@ namespace SWAddin
                 if (string.IsNullOrEmpty(sample)) { if (!hollow.ContainsKey(comp.title)) { hollow.Add(comp.title, comp.title); } }
                 //Ищем повторы
                 allFind = allFoundFiles.FindAll(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase)!= -1);
-                if (allFind.Count>1) { if (!multiple.ContainsKey(comp.title)) { multiple.Add(comp.title, comp.title); } }
+                if (allFind.Count>1) { if (!multiple.ContainsKey(comp.title)) { multiple.Add(comp.title, comp.footprint); } }
                 //Регистронезависимый поиск
                 comp.fileName = allFoundFiles.Find(item => item.IndexOf(sample, StringComparison.OrdinalIgnoreCase)!= -1);
                 //comp.fileName = allFoundFiles.Find(item => item.Contains(sample));
@@ -472,18 +472,18 @@ namespace SWAddin
                 {
                     estr = "Отсутствуют 3d модели футпринтов"+System.Environment.NewLine;
                     StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 3) + "txt", false);
-                    foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Value + System.Environment.NewLine; writer.WriteLine(str.Value); }
+                    foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Key + System.Environment.NewLine; writer.WriteLine(str.Value); }
                     writer.Close();
                 }
                 if (hollow.Count != 0)
                 {
                     estr = estr + "У этих компонентов пустые строки футпринтов" + System.Environment.NewLine;
-                    foreach (KeyValuePair<string, string> str in hollow) { estr = estr + str.Value + System.Environment.NewLine; }
+                    foreach (KeyValuePair<string, string> str in hollow) { estr = estr + str.Key + System.Environment.NewLine; }
                 }
                 if (multiple.Count != 0)
                 {
                     estr = estr + "Найдено несколько футпринтов этих компонентов" + System.Environment.NewLine;
-                    foreach (KeyValuePair<string, string> str in multiple) { estr = estr + str.Value + System.Environment.NewLine; }
+                    foreach (KeyValuePair<string, string> str in multiple) { estr = estr + str.Key+">"+str.Value + System.Environment.NewLine; }
                 }
 
                 MessageBox.Show(estr, "Внимание");
