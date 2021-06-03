@@ -471,7 +471,7 @@ namespace SWAddin
                 if (empty.Count != 0)
                 {
                     estr = "Отсутствуют 3d модели футпринтов"+System.Environment.NewLine;
-                    StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 3) + "txt", false);
+                    StreamWriter writer = new StreamWriter(filename.Remove(filename.Length - 4)+ "_footprint" + ".txt", false);
                     foreach (KeyValuePair<string, string> str in empty) { estr = estr + str.Key + System.Environment.NewLine; writer.WriteLine(str.Value); }
                     writer.Close();
                 }
@@ -483,7 +483,9 @@ namespace SWAddin
                 if (multiple.Count != 0)
                 {
                     estr = estr + "Найдено несколько футпринтов этих компонентов" + System.Environment.NewLine;
-                    foreach (KeyValuePair<string, string> str in multiple) { estr = estr + str.Key+">"+str.Value + System.Environment.NewLine; }
+                    StreamWriter writer_m = new StreamWriter(filename.Remove(filename.Length - 4) + "_дубляжи" + ".txt", false);
+                    foreach (KeyValuePair<string, string> str in multiple) { estr = estr + str.Key+"->"+str.Value + System.Environment.NewLine; writer_m.WriteLine(str.Key+"->"+str.Value); }
+                    writer_m.Close();
                 }
 
                 MessageBox.Show(estr, "Внимание");
