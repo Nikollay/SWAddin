@@ -328,6 +328,7 @@ namespace SWAddin
                     break;
             }
             List<string> allFoundFiles = new List<string>(Directory.GetFiles(path, "*.SLD*", SearchOption.AllDirectories));
+            allFoundFiles.AddRange(Directory.GetFiles("D:\\PDM\\Прочие изделия\\ЭРИ\\T", "*.SLD*", SearchOption.AllDirectories));
             List<string> allFind;
             Dictionary<string, string> empty = new Dictionary<string, string>();
             Dictionary<string, string> hollow = new Dictionary<string, string>();
