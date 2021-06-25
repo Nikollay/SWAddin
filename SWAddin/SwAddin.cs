@@ -521,19 +521,17 @@ namespace SWAddin
                     return;
                 }
                 swModel = (ModelDoc2)iSwApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
-            }
-
-            iSwApp.UnloadAddIn(sAddinName);
+            }                   
             
-            fileName = swModel.GetPathName();
             //Проверяем открыта сборка или нет
             if ((swModel.GetType() != 2) | (swModel == null))
             {
                 iSwApp.SendMsgToUser2("Откройте сборку", 4, 2);
                 return;
             }
-            
 
+            iSwApp.UnloadAddIn(sAddinName);
+            fileName = swModel.GetPathName();
             doc = new XDocument(new XDeclaration("1.0", "Windows-1251", "Yes"));
             xml = new XElement("xml");
             transaction = new XElement("transaction", new XAttribute("Type", "SOLIDWORKS"), new XAttribute("version", "1.2"), new XAttribute("Date", DateTime.Now.ToString("d")), new XAttribute("Time", DateTime.Now.ToString("T")));
