@@ -62,29 +62,32 @@ namespace SWAddin
             ConfigurationManager confManager;
             string configuration;
             double[] aTrans;
-            string path;
+            string path, used;
 
             coll = new List<Comp>();
             //swModel.ShowConfiguration2(f.conf[i]);
             swAssy = (AssemblyDoc)swApp.ActiveDoc;
             swAssy.ResolveAllLightWeightComponents(false);
             comps = (object[])swAssy.GetComponents(true);
- 
+
+            //Проверка входимости
+            swModel = (ModelDoc2)swAssy;
+            swModelDocExt = swModel.Extension;
+            confManager = (ConfigurationManager)swModel.ConfigurationManager;
+            configuration = confManager.ActiveConfiguration.Name;
+            prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
+            prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
+            used = valOut.Trim();
+            if (string.IsNullOrEmpty(used)) { used = "XXXX.XXXXXX.XXX"; }
+            
             for (int i = 0; i < comps.Length; i++)
             {
-                           
-                    component = new Comp();
-                    swModel = (ModelDoc2)swAssy;
-                    swModelDocExt = swModel.Extension;
 
-
-                    confManager = (ConfigurationManager)swModel.ConfigurationManager;
-                    configuration = confManager.ActiveConfiguration.Name;
-                    prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
-                    prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
-                    component.used = valOut.Trim();
-               
-                    comp = (Component2)comps[i];
+                component = new Comp
+                {
+                    used = used
+                };
+                comp = (Component2)comps[i];
                     //проверка компонента
                     if (comp == null)
                     {
@@ -128,16 +131,19 @@ namespace SWAddin
                         prpMgr.Get6("Раздел", true, out valOut, out _, out _, out _);
                         component.chapter = valOut;
                         if (component.chapter == "Сборочные единицы") { prpMgr.Get6("Перв. примен.", true, out valOut, out _, out _, out _); }
-                        if (component.chapter == "Детали") { prpMgr.Get6("Перв.примен.", true, out valOut, out _, out _, out _); }
+                        else if (component.chapter == "Детали") { prpMgr.Get6("Перв.примен.", true, out valOut, out _, out _, out _); }
                         else { valOut = ""; }
                         component.included = valOut.Trim();
 
                         //Примечание заим.
                         if ((component.chapter == "Сборочные единицы") | (component.chapter == "Детали"))
                         {
-                            if (!component.used.Contains(component.included))
+
+                        if (string.IsNullOrEmpty(component.included)) { component.included = "XXXX.XXXXXX.XXX"; }
+                        
+                        if (!component.used.Contains(component.included))
                             {
-                            if (string.IsNullOrEmpty(component.note)) { component.note = component.included.Substring(5); }
+                            if (string.IsNullOrEmpty(component.note.Trim())) { component.note = component.included.Substring(5); }
                             else if (component.note.ToLower().Contains("общеприм")) { }
                             else { component.note = component.note + (char)32 + component.included.Substring(5); }
                             }
@@ -147,7 +153,8 @@ namespace SWAddin
                         {
                             prpMgr.Get6("Документ на поставку", true, out valOut, out _, out _, out _);
                             component.doc = valOut;
-                            component.type = component.name.Substring(0, component.name.IndexOf((char)32));
+                            if (!string.IsNullOrEmpty(component.name)) { component.type = component.name.Substring(0, component.name.IndexOf((char)32)); }
+                            else { component.type = ""; }
                         }
 
                         component.x = Math.Round((aTrans[9] * 1000), 2);
