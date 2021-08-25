@@ -121,15 +121,15 @@ namespace SWAddin
                         //continue;
                         }
                         prpMgr.Get6("Формат", true, out valOut, out _, out _, out _);
-                        component.format = valOut;
+                        component.format = valOut.Trim();
                         prpMgr.Get6("Обозначение", true, out valOut, out _, out _, out _);
-                        component.designation = valOut;
+                        component.designation = valOut.Trim();
                         prpMgr.Get6("Наименование", true, out valOut, out _, out _, out _);
-                        component.name = valOut;
+                        component.name = valOut.Trim();
                         prpMgr.Get6("Примечание", true, out valOut, out _, out _, out _);
-                        component.note = valOut;
+                        component.note = valOut.Trim();
                         prpMgr.Get6("Раздел", true, out valOut, out _, out _, out _);
-                        component.chapter = valOut;
+                        component.chapter = valOut.Trim();
                         if (component.chapter == "Сборочные единицы") { prpMgr.Get6("Перв. примен.", true, out valOut, out _, out _, out _); }
                         else if (component.chapter == "Детали") { prpMgr.Get6("Перв.примен.", true, out valOut, out _, out _, out _); }
                         else { valOut = ""; }
