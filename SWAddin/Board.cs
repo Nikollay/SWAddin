@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Windows.Forms;
 using System.Linq;
-using Excel = Microsoft.Office.Interop.Excel;
 
 using System.IO;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System.Globalization;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace SWAddin
 {
@@ -346,16 +347,18 @@ namespace SWAddin
             return filename;
         }
 
-        public static Excel.Workbook GetfromXDocument(XDocument doc, Excel.Application xlApp)
+        public static ExcelPackage GetfromXDocument(XDocument doc)
         {
             IEnumerable<XElement> elements1, elements2;
-            Excel.Worksheet wh, wh1, wh2;
-            Excel.Range wc;
-            Excel.Workbook wb = xlApp.Workbooks.Add("D:\\PDM\\EPDM_LIBRARY\\EPDM_Specification\\sp.xls");
+            ExcelPackage pck = new OfficeOpenXml.ExcelPackage(new FileInfo("D:\\PDM\\EPDM_LIBRARY\\EPDM_Specification\\sp.xls"),false);
+            ExcelWorksheet wh, wh1, wh2;
+            ExcelRange wc;
+            //ExcelWorkbook wb = Workbooks.Add("D:\\PDM\\EPDM_LIBRARY\\EPDM_Specification\\sp.xls");
             XElement tmpXEl;
             string designation;
             //Заполняем шапку
-            wh = (Excel.Worksheet)wb.Worksheets[1];
+
+            wh = pck.Workbook.Worksheets[1];
             try
             { 
             elements1 = doc.Root.Element("transaction").Element("project").Element("configurations").Element("configuration").Element("graphs").Elements();
@@ -365,32 +368,31 @@ namespace SWAddin
                 return null;
             }
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Проект"));
-            wh.Cells[1, 1] = tmpXEl.Attribute("value").Value;
+            wh.Cells[1, 1].Value = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Первичная применяемость")|item.Attribute("name").Value.Equals("Перв.Примен."));
-            wh.Cells[1, 3] = tmpXEl.Attribute("value").Value;
-            wh.Cells[3, 14] = "Документация";
-            wc = (Excel.Range)wh.Cells[3, 14];
-            wc.Font.Underline = true;
-            wc.Font.Underline = true;
-            wc.Font.Bold = true;
-            wc.HorizontalAlignment = -4108; // xlCenterF
-            wc.VerticalAlignment = -4108; // xlCenter
-            wh.Cells[5, 4] = "A3";
+            wh.Cells[1, 3].Value = tmpXEl.Attribute("value").Value;
+            wh.Cells[3, 14].Value = "Документация";
+            wc = wh.Cells[3, 14];
+            wc.Style.Font.UnderLine = true;
+            wc.Style.Font.Bold = true;
+            wc.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // xlCenterF
+            wc.Style.VerticalAlignment = ExcelVerticalAlignment.Center; // xlCenter
+            wh.Cells[5, 4].Value = "A3";
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Обозначение"));
             designation = tmpXEl.Attribute("value").Value;
-            wh.Cells[5, 9] = tmpXEl.Attribute("value").Value + "СБ";
-            wh.Cells[5, 14] = "Сборочный чертеж";
-            wh.Cells[32, 12] = tmpXEl.Attribute("value").Value;
+            wh.Cells[5, 9].Value = tmpXEl.Attribute("value").Value + "СБ";
+            wh.Cells[5, 14].Value = "Сборочный чертеж";
+            wh.Cells[32, 12].Value = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Equals("Наименование"));
-            wh.Cells[35, 12] = tmpXEl.Attribute("value").Value;
+            wh.Cells[35, 12].Value = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Разработал конструктор")|item.Attribute("name").Value.Contains("п_Разраб"));
-            wh.Cells[35, 8] = tmpXEl.Attribute("value").Value;
+            wh.Cells[35, 8].Value = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Проверил конструктор")|item.Attribute("name").Value.Contains("п_Пров_P"));
-            wh.Cells[36, 8] = tmpXEl.Attribute("value").Value;
+            wh.Cells[36, 8].Value = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Нормоконтроль")|item.Attribute("name").Value.Contains("п_Н_контр"));
-            wh.Cells[38, 8] = tmpXEl.Attribute("value").Value;
+            wh.Cells[38, 8].Value = tmpXEl.Attribute("value").Value;
             tmpXEl = elements1.First(item => item.Attribute("name").Value.Contains("Утвердил")|item.Attribute("name").Value.Contains("п_Утв"));
-            wh.Cells[39, 8] = tmpXEl.Attribute("value").Value;
+            wh.Cells[39, 8].Value = tmpXEl.Attribute("value").Value;
 
             //Заполняем словарь
             try
@@ -461,75 +463,78 @@ namespace SWAddin
                 if ((j % 4) == 0) { j++; }
                 if (!lr.chapter.Equals(partition))
                 {
-                    wc = (Excel.Range)wh.Cells[j + 2, 14];
-                    wh.Cells[j + 2, 14] = lr.chapter;
-                    wc.Font.Underline = true;
-                    wc.Font.Bold = true;
-                    wc.HorizontalAlignment = -4108; //xlCenter
-                    wc.VerticalAlignment = -4108; //xlCenter
+                    wc = wh.Cells[j + 2, 14];
+                    wh.Cells[j + 2, 14].Value = lr.chapter;
+                    wc.Style.Font.UnderLine = true;
+                    wc.Style.Font.Bold = true;
+                    wc.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // xlCenterF
+                    wc.Style.VerticalAlignment = ExcelVerticalAlignment.Center; // xlCenter
                     j += 5;
                     partition = lr.chapter;
                 }
 
-                if ((j > 26)&(wh.Name.Equals("1")))
+                if ((j > 26) & (wh.Name.Equals("1")))
                 {
-                    wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
-                    wh2 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
-                    wh1.Copy(After: wh2);
-                    wh = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
+                    wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
+                    wh2 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
+                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add((wh2.Index+1).ToString(), wh1);
+                    //wh1.Copy(After: wh2);
+                    wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
                     j = 4;
                 }
 
                 if (j > 33)
                 {
-                    wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
-                    wh2 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
-                    wh1.Copy(After: wh2);
-                    wh = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 2);
+                    wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
+                    wh2 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
+                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add((wh2.Index + 1).ToString(), wh1);
+                    //wh1.Copy(After: wh2);
+                    wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
                     j = 4;
                 }
 
-                wh.Cells[j, 4] = lr.format;
-                wh.Cells[j, 9] = lr.designation;
-                wh.Cells[j, 20] = lr.quantity;
-                wh.Cells[j, 21] = lr.note;
+                wh.Cells[j, 4].Value = lr.format;
+                wh.Cells[j, 9].Value = lr.designation;
+                wh.Cells[j, 20].Value = lr.quantity;
+                wh.Cells[j, 21].Value = lr.note;
                 //wh.Cells[j, 14] = lr.title;
-                if (lr.title.Length < 33) { wh.Cells[j, 14] = lr.title; }
+                if (lr.title.Length < 33) { wh.Cells[j, 14].Value = lr.title; }
 
                 if (lr.title.Length > 32)
                 {
-                    wh.Cells[j, 14] = lr.title.Substring(0, 31);
-                    wh.Cells[j + 1, 14] = lr.title.Substring(31);
+                    wh.Cells[j, 14].Value = lr.title.Substring(0, 31);
+                    wh.Cells[j + 1, 14].Value = lr.title.Substring(31);
                     j += 1;
                 }
                 j += 1;
             }
             //Заполнили
-            wh1 = (Excel.Worksheet)wb.Sheets.get_Item(wb.Worksheets.Count - 1);
-            wh1.Delete();//Удаляем лист шаблон
+            
+            pck.Workbook.Worksheets.Delete(pck.Workbook.Worksheets.Count - 1);
+            //Удаляем лист шаблон
 
-            if (wb.Worksheets.Count == 2)
+            if (pck.Workbook.Worksheets.Count == 2)
             {
-                wh = (Excel.Worksheet)wb.Sheets.get_Item(1);
-                wh.Cells[36, 19] = "";
+                wh = pck.Workbook.Worksheets[1];
+                wh.Cells[36, 19].Value = "";
             }
-            if (wb.Worksheets.Count < 4) { wh1 = (Excel.Worksheet)wb.Sheets.get_Item("ЛРИ"); wh1.Delete(); } //Удаляем лист ЛРИ
-            wh = (Excel.Worksheet)wb.Sheets.get_Item(1);
-            wh.Cells[36, 22] = wb.Worksheets.Count;
+            if (pck.Workbook.Worksheets.Count < 4) { pck.Workbook.Worksheets.Delete(pck.Workbook.Worksheets.Count); } //Удаляем лист ЛРИ
+            wh = pck.Workbook.Worksheets[1];
+            wh.Cells[36, 22].Value = pck.Workbook.Worksheets.Count;
 
-            for (int i = 2; i < wb.Worksheets.Count+1; i++)
+            for (int i = 2; i < pck.Workbook.Worksheets.Count+1; i++)
                 {
-                    wh = (Excel.Worksheet)wb.Sheets.get_Item(i);
-                    wh.Cells[35, 12] = designation;
+                    wh = pck.Workbook.Worksheets[i];
+                    wh.Cells[35, 12].Value = designation;
                     if (!wh.Name.Equals("ЛРИ"))
                     {
                         wh.Name = i.ToString();
-                        wh.Cells[37, 22] = i;
+                        wh.Cells[37, 22].Value = i;
                     }
-                    if (wh.Name.Equals("ЛРИ")) { wh.Cells[37, 19] = wb.Worksheets.Count; }
+                    if (wh.Name.Equals("ЛРИ")) { wh.Cells[37, 19].Value = pck.Workbook.Worksheets.Count; }
                 }
             
-        return wb;
+        return pck;
         }
         private static XDocument GetBRD(string filename)
         {

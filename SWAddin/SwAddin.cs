@@ -13,7 +13,8 @@ using System.Windows.Forms;
 using System.IO;
 using System.ComponentModel;
 using System.Xml.Linq;
-using Excel = Microsoft.Office.Interop.Excel;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace SWAddin
 {
@@ -753,19 +754,14 @@ namespace SWAddin
             string filename;
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _);
             if (string.IsNullOrWhiteSpace(filename)) { return; }
-
-            Excel.Application xlApp = new Excel.Application();
-            xlApp.Visible = false;
-            xlApp.DisplayAlerts = false;
             
             XDocument doc = XDocument.Load(filename);
-            Excel.Workbook wb = Board.GetfromXDocument(doc, xlApp);
+            ExcelPackage wb = Board.GetfromXDocument(doc);
             if (wb == null) { MessageBox.Show("XML с неверной структурой", "Ошибка чтения файла"); return; }
-            xlApp.DisplayAlerts = true;
             filename = filename.Substring(0, filename.Length - 4);
-            wb.SaveAs(filename + "SP" + ".xlsx");
-            wb.Close();
-            xlApp.Quit();
+            wb.SaveAs(new FileInfo(filename + "SP" + ".xlsx"));
+            wb.Dispose();
+            
         }
         
         #endregion

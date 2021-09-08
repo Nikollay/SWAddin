@@ -394,13 +394,14 @@ namespace SWAddin
             swModelDocExt = swModel.Extension;
             prpMgr = swModelDocExt.get_CustomPropertyManager(configuration);
             prpMgr.Get6("Обозначение", true, out string valOut, out _, out _, out _);
-            title = valOut;
+            title = valOut.Trim();
             name[0] = new XAttribute("name", "Раздел СП");
             value[0] = new XAttribute("value", "Документация");
             name[1] = new XAttribute("name", "Наименование");
             value[1] = new XAttribute("value", "Сборочный чертеж");
             name[2] = new XAttribute("name", "Обозначение");
-            value[2] = new XAttribute("value", title + "СБ");
+            if (title.IndexOf((char)45) != -1) { value[2] = new XAttribute("value", title.Substring(0, title.IndexOf((char)45)) + "СБ"); }
+            else { value[2] = new XAttribute("value", title + "СБ"); }           
             name[3] = new XAttribute("name", "Код продукции");
             value[3] = new XAttribute("value", "");
             name[4] = new XAttribute("name", "Формат");
