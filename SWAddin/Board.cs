@@ -350,10 +350,9 @@ namespace SWAddin
         public static ExcelPackage GetfromXDocument(XDocument doc)
         {
             IEnumerable<XElement> elements1, elements2;
-            ExcelPackage pck = new OfficeOpenXml.ExcelPackage(new FileInfo("D:\\PDM\\EPDM_LIBRARY\\EPDM_Specification\\sp.xls"),false);
-            ExcelWorksheet wh, wh1, wh2;
+            ExcelPackage pck = new OfficeOpenXml.ExcelPackage(new FileInfo("D:\\PDM\\EPDM_LIBRARY\\EPDM_SolidWorks\\ADDIN\\sp.xlsx"), false);
+            ExcelWorksheet wh, wh1;
             ExcelRange wc;
-            //ExcelWorkbook wb = Workbooks.Add("D:\\PDM\\EPDM_LIBRARY\\EPDM_Specification\\sp.xls");
             XElement tmpXEl;
             string designation;
             //Заполняем шапку
@@ -447,16 +446,10 @@ namespace SWAddin
             {
                 foreach (var v in d.Values) { list.Add(v); }
             }
-            //string path= "d:\\Домашняя работа\\test.txt";
-            //File.WriteAllLines(path, dictS.Select(kvp => string.Format("{0};{1}", kvp.Key, kvp.Value.quantity)));
-            //dict = (Dictionary<string, Record>)dictS.GroupBy(g => g.Value.chapter);
-            //path = "d:\\Домашняя работа\\test_s.txt";
-            //File.WriteAllLines(path, dict.Select(kvp => string.Format("{0};{1}", kvp.Key, kvp.Value.quantity)));
-            //MessageBox.Show(dict.Count.ToString());
+
             string partition = "Документация";
             int j = 6;
-
-
+            //MessageBox.Show(list.Count.ToString());
             //Заполняем листы
             foreach (Record lr in list)
             {
@@ -476,9 +469,8 @@ namespace SWAddin
                 if ((j > 26) & (wh.Name.Equals("1")))
                 {
                     wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
-                    wh2 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
-                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add((wh2.Index+1).ToString(), wh1);
-                    //wh1.Copy(After: wh2);
+                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист "+(wh1.Index+1).ToString(), wh1);
+                    pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
                     wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
                     j = 4;
                 }
@@ -486,9 +478,8 @@ namespace SWAddin
                 if (j > 33)
                 {
                     wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
-                    wh2 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
-                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add((wh2.Index + 1).ToString(), wh1);
-                    //wh1.Copy(After: wh2);
+                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
+                    pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
                     wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
                     j = 4;
                 }
@@ -497,7 +488,7 @@ namespace SWAddin
                 wh.Cells[j, 9].Value = lr.designation;
                 wh.Cells[j, 20].Value = lr.quantity;
                 wh.Cells[j, 21].Value = lr.note;
-                //wh.Cells[j, 14] = lr.title;
+                
                 if (lr.title.Length < 33) { wh.Cells[j, 14].Value = lr.title; }
 
                 if (lr.title.Length > 32)
@@ -518,7 +509,7 @@ namespace SWAddin
                 wh = pck.Workbook.Worksheets[1];
                 wh.Cells[36, 19].Value = "";
             }
-            if (pck.Workbook.Worksheets.Count < 4) { pck.Workbook.Worksheets.Delete(pck.Workbook.Worksheets.Count); } //Удаляем лист ЛРИ
+            if (pck.Workbook.Worksheets.Count < 4) { pck.Workbook.Worksheets.Delete("ЛРИ"); } //Удаляем лист ЛРИ
             wh = pck.Workbook.Worksheets[1];
             wh.Cells[36, 22].Value = pck.Workbook.Worksheets.Count;
 
