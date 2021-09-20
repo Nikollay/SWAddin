@@ -8,7 +8,7 @@ namespace SWAddin
 {
     class Record
     {
-        public string format, designation, title, note, chapter;
+        public string pos, format, designation, title, note, chapter, count;
         public int quantity;
     }
 }

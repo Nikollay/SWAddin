@@ -347,14 +347,18 @@ namespace SWAddin
             return filename;
         }
 
-        public static ExcelPackage GetfromXDocument(XDocument doc)
+        public static ExcelPackage GetfromXDocument(XDocument doc, string pdm_path)
         {
             IEnumerable<XElement> elements1, elements2;
-            ExcelPackage pck = new OfficeOpenXml.ExcelPackage(new FileInfo("D:\\PDM\\EPDM_LIBRARY\\EPDM_SolidWorks\\ADDIN\\sp.xlsx"), false);
+            ExcelPackage pck = new OfficeOpenXml.ExcelPackage(new FileInfo(pdm_path + "EPDM_LIBRARY\\EPDM_SolidWorks\\ADDIN\\sp.xlsx"), false);
             ExcelWorksheet wh, wh1;
             ExcelRange wc;
             XElement tmpXEl;
-            string designation;
+            string designation, type;
+            //Провека GostDoc или нет
+            //tmpXEl = doc.Root.Element("transaction").Elements().First(item => item.Attribute("Type").Value.Equals("GostDoc"));
+            type = doc.Root.Element("transaction").Attribute("Type").Value;
+
             //Заполняем шапку
 
             wh = pck.Workbook.Worksheets[1];
@@ -432,6 +436,12 @@ namespace SWAddin
                         case "Раздел СП":
                             component.chapter = e2.Attribute("value").Value;
                             break;
+                        case "Позиция":
+                            component.pos = e2.Attribute("value").Value;
+                            break;
+                        case "Количество":
+                            component.count = e2.Attribute("value").Value;
+                            break;
                     }
                 }
                 key = component.designation + (char)32 + component.title;
@@ -440,64 +450,125 @@ namespace SWAddin
             }
 
             //Заполнили словарь *******
-            //Сортировка
-            var dict = dictS.GroupBy(g => g.Value.chapter).OrderBy(n => n.Key, new CustomComparer()).ToDictionary(group => group.Key, group => group.ToDictionary(pair => pair.Key, pair => pair.Value));
-            foreach (var d in dict.Values)
+            //Сортировка type=="GostDoc"
+            if (type == "GostDoc")
             {
-                foreach (var v in d.Values) { list.Add(v); }
+                foreach (var v in dictS.Values) { list.Add(v); } 
             }
-
+            else 
+            {
+                var dict = dictS.GroupBy(g => g.Value.chapter).OrderBy(n => n.Key, new CustomComparer()).ToDictionary(group => group.Key, group => group.ToDictionary(pair => pair.Key, pair => pair.Value));
+                foreach (var d in dict.Values)
+                {
+                    foreach (var v in d.Values) { list.Add(v); }
+                }
+            }
             string partition = "Документация";
             int j = 6;
             //MessageBox.Show(list.Count.ToString());
             //Заполняем листы
-            foreach (Record lr in list)
+
+            if (type == "GostDoc")
             {
-                if ((j % 4) == 0) { j++; }
-                if (!lr.chapter.Equals(partition))
+                foreach (Record lr in list)
                 {
-                    wc = wh.Cells[j + 2, 14];
-                    wh.Cells[j + 2, 14].Value = lr.chapter;
-                    wc.Style.Font.UnderLine = true;
-                    wc.Style.Font.Bold = true;
-                    wc.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // xlCenterF
-                    wc.Style.VerticalAlignment = ExcelVerticalAlignment.Center; // xlCenter
-                    j += 5;
-                    partition = lr.chapter;
-                }
+                    if (!lr.chapter.Equals(partition))
+                    {
+                        wc = wh.Cells[j + 2, 14];
+                        wh.Cells[j + 2, 14].Value = lr.chapter;
+                        wc.Style.Font.UnderLine = true;
+                        wc.Style.Font.Bold = true;
+                        wc.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // xlCenterF
+                        wc.Style.VerticalAlignment = ExcelVerticalAlignment.Center; // xlCenter
+                        j += 5;
+                        partition = lr.chapter;
+                    }
 
-                if ((j > 26) & (wh.Name.Equals("1")))
-                {
-                    wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
-                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист "+(wh1.Index+1).ToString(), wh1);
-                    pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
-                    wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
-                    j = 4;
-                }
+                    if ((j > 26) & (wh.Name.Equals("1")))
+                    {
+                        wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
+                        ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
+                        pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
+                        wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
+                        j = 4;
+                    }
 
-                if (j > 33)
-                {
-                    wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
-                    ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
-                    pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
-                    wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
-                    j = 4;
-                }
+                    if (j > 33)
+                    {
+                        wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
+                        ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
+                        pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
+                        wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
+                        j = 4;
+                    }
 
-                wh.Cells[j, 4].Value = lr.format;
-                wh.Cells[j, 9].Value = lr.designation;
-                wh.Cells[j, 20].Value = lr.quantity;
-                wh.Cells[j, 21].Value = lr.note;
-                
-                if (lr.title.Length < 33) { wh.Cells[j, 14].Value = lr.title; }
+                    wh.Cells[j, 4].Value = lr.format;
+                    wh.Cells[j, 7].Value = lr.pos;
+                    wh.Cells[j, 9].Value = lr.designation;
+                    wh.Cells[j, 20].Value = lr.count;
+                    wh.Cells[j, 21].Value = lr.note;
 
-                if (lr.title.Length > 32)
-                {
-                    wh.Cells[j, 14].Value = lr.title.Substring(0, 31);
-                    wh.Cells[j + 1, 14].Value = lr.title.Substring(31);
+                    if (lr.title.Length < 33) { wh.Cells[j, 14].Value = lr.title; }
+
+                    if (lr.title.Length > 32)
+                    {
+                        wh.Cells[j, 14].Value = lr.title.Substring(0, 31);
+                        wh.Cells[j + 1, 14].Value = lr.title.Substring(31);
+                        j += 1;
+                    }
                     j += 1;
                 }
-                j += 1;
+            }
+            else
+            {
+                foreach (Record lr in list)
+                {
+                    if ((j % 4) == 0) { j++; }
+                    if (!lr.chapter.Equals(partition))
+                    {
+                        wc = wh.Cells[j + 2, 14];
+                        wh.Cells[j + 2, 14].Value = lr.chapter;
+                        wc.Style.Font.UnderLine = true;
+                        wc.Style.Font.Bold = true;
+                        wc.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center; // xlCenterF
+                        wc.Style.VerticalAlignment = ExcelVerticalAlignment.Center; // xlCenter
+                        j += 5;
+                        partition = lr.chapter;
+                    }
+
+                    if ((j > 26) & (wh.Name.Equals("1")))
+                    {
+                        wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
+                        ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
+                        pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
+                        wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
+                        j = 4;
+                    }
+
+                    if (j > 33)
+                    {
+                        wh1 = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 1];
+                        ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
+                        pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
+                        wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
+                        j = 4;
+                    }
+
+                    wh.Cells[j, 4].Value = lr.format;
+                    wh.Cells[j, 9].Value = lr.designation;
+                    wh.Cells[j, 20].Value = lr.quantity;
+                    wh.Cells[j, 21].Value = lr.note;
+
+                    if (lr.title.Length < 33) { wh.Cells[j, 14].Value = lr.title; }
+
+                    if (lr.title.Length > 32)
+                    {
+                        wh.Cells[j, 14].Value = lr.title.Substring(0, 31);
+                        wh.Cells[j + 1, 14].Value = lr.title.Substring(31);
+                        j += 1;
+                    }
+                    j += 1;
+                }
             }
             //Заполнили
             

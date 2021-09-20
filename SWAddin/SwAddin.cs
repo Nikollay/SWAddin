@@ -27,6 +27,7 @@ namespace SWAddin
         ISldWorks iSwApp = null;
         ICommandManager iCmdMgr = null;
         int addinID = 0;
+        string pdm_path;
 
         public const int mainCmdGroupID = 5;
         public const int mainItemID1 = 1;
@@ -223,6 +224,9 @@ namespace SWAddin
 
         public void Create3DPCB()
         {
+            if (Directory.Exists("D:\\PDM\\")){ pdm_path = "D:\\PDM\\"; }
+            else if (Directory.Exists("C:\\PDM\\")) { pdm_path = "C:\\PDM\\"; }
+            else { MessageBox.Show("Не найден путь PDM"); return; }
             //iSwApp.CommandInProgress = true;
             Board board;
             string filename;
@@ -240,7 +244,7 @@ namespace SWAddin
             double swSheetWidth = 0, swSheetHeight = 0;
             string boardName;
             int Errors = 0, Warnings = 0;
-            swAssy = (AssemblyDoc)iSwApp.NewDocument("D:\\PDM\\EPDM_LIBRARY\\EPDM_SolidWorks\\EPDM_SWR_Templates\\Модуль_печатной_платы.asmdot", (int)swDwgPaperSizes_e.swDwgPaperA2size, swSheetWidth, swSheetHeight);
+            swAssy = (AssemblyDoc)iSwApp.NewDocument(pdm_path+"EPDM_LIBRARY\\EPDM_SolidWorks\\EPDM_SWR_Templates\\Модуль_печатной_платы.asmdot", (int)swDwgPaperSizes_e.swDwgPaperA2size, swSheetWidth, swSheetHeight);
             swModel = (ModelDoc2)swAssy;
             //Сохранение
             boardName = filename.Remove(filename.Length - 3) + "SLDASM";
@@ -319,17 +323,17 @@ namespace SWAddin
             switch (board.ver)
             {
                 case 1:
-                    path = "D:\\PDM\\Прочие изделия\\ЭРИ";
+                    path = pdm_path + "Прочие изделия\\ЭРИ";
                     break;
                 case 2:
-                    path = "D:\\PDM\\Прочие изделия\\Footprint";
+                    path = pdm_path + "Прочие изделия\\Footprint";
                     break;
                 default:
-                    path = "D:\\PDM\\Прочие изделия\\ЭРИ";
+                    path = pdm_path + "Прочие изделия\\ЭРИ";
                     break;
             }
             List<string> allFoundFiles = new List<string>(Directory.GetFiles(path, "*.SLD*", SearchOption.AllDirectories));
-            allFoundFiles.AddRange(Directory.GetFiles("D:\\PDM\\Прочие изделия\\ЭРИ\\T", "*.SLD*", SearchOption.AllDirectories));
+            allFoundFiles.AddRange(Directory.GetFiles(pdm_path+"Прочие изделия\\ЭРИ\\T", "*.SLD*", SearchOption.AllDirectories));
             List<string> allFind;
             Dictionary<string, string> empty = new Dictionary<string, string>();
             Dictionary<string, string> hollow = new Dictionary<string, string>();
@@ -366,7 +370,7 @@ namespace SWAddin
                 
                 if (string.IsNullOrWhiteSpace(comp.fileName))
                 {
-                    comp.fileName = "D:\\PDM\\Прочие изделия\\ЭРИ\\Zero.SLDPRT";
+                    comp.fileName = pdm_path + "Прочие изделия\\ЭРИ\\Zero.SLDPRT";
                     if (!empty.ContainsKey(sample)) { empty.Add(sample, sample); }
                 }
             }
@@ -589,6 +593,11 @@ namespace SWAddin
         {
             //object obt= iSwApp.GetAddInObject("ConisioSW2.ConisioSWAddIn") as SwAddin;
             //iSwApp.CommandInProgress = true;
+
+            if (Directory.Exists("D:\\PDM\\")) { pdm_path = "D:\\PDM\\"; }
+            else if (Directory.Exists("C:\\PDM\\")) { pdm_path = "C:\\PDM\\"; }
+            else { MessageBox.Show("Не найден путь PDM"); return; }
+
             ModelDoc2 swModel;
             ModelDocExtension swModelDocExt;
             AssemblyDoc swAssy;
@@ -695,7 +704,7 @@ namespace SWAddin
             {
                 if (value == 6)
                 {
-                    if ((k.Value.Contains((string)"D:\\PDM\\Проект")) | (k.Value.Contains("D:\\PDM\\Общеприменяемые")))
+                    if ((k.Value.Contains((string)(pdm_path + "Проект"))) | (k.Value.Contains((pdm_path + "Общеприменяемые"))))
                     {
                         Drw.Add(k.Key, k.Value);
                     }
@@ -750,13 +759,16 @@ namespace SWAddin
         }
         public void GetXLS()
         {
+            if (Directory.Exists("D:\\PDM\\")) { pdm_path = "D:\\PDM\\"; }
+            else if (Directory.Exists("C:\\PDM\\")) { pdm_path = "C:\\PDM\\"; }
+            else { MessageBox.Show("Не найден путь PDM"); return; }
             //MessageBox.Show("ДА");
             string filename;
             filename = iSwApp.GetOpenFileName("Открыть файл", "", "xml Files (*.xml)|*.xml|", out _, out _, out _);
             if (string.IsNullOrWhiteSpace(filename)) { return; }
             
             XDocument doc = XDocument.Load(filename);
-            ExcelPackage wb = Board.GetfromXDocument(doc);
+            ExcelPackage wb = Board.GetfromXDocument(doc, pdm_path);
             if (wb == null) { MessageBox.Show("XML с неверной структурой", "Ошибка чтения файла"); return; }
             filename = filename.Substring(0, filename.Length - 4);
             wb.SaveAs(new FileInfo(filename + "SP" + ".xlsx"));
