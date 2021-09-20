@@ -413,58 +413,58 @@ namespace SWAddin
             List<Record> list;
             list = new List<Record>();
             string key;
+
             if (type == "GostDoc")
             {
                 foreach (XElement e1 in elements1)
                 {
                     component = new Record();
                     elements2 = e1.Element("properties").Elements();
-                    foreach (XElement e2 in elements2)
+                    tmpXEl = elements2.First(item => item.Attribute("name").Value.Equals("Наименование"));
+                    if (String.IsNullOrEmpty(tmpXEl.Attribute("value").Value))
                     {
-                        if(String.IsNullOrEmpty(e2.Elements().First(item => item.Attribute("name").Value.Equals("Наименование")).Value))
-                        {                                                   
-                                component.format = "";
-                                component.designation = "";
-                                component.title = "";
-                                component.note = "";
-                                component.chapter = "";
-                                component.pos = "";
-                                component.count = "";
-                                list.Add(component);
-                        }
-                        else
-                        {
-                        switch (e2.Attribute("name").Value)
-                            {
-                            case "Формат":
-                                component.format = e2.Attribute("value").Value;
-                                break;
-                            case "Обозначение":
-                                component.designation = e2.Attribute("value").Value;
-                                break;
-                            case "Наименование":
-                                component.title = e2.Attribute("value").Value;
-                                break;
-                            case "Примечание":
-                                component.note = e2.Attribute("value").Value;
-                                break;
-                            case "Раздел СП":
-                                component.chapter = e2.Attribute("value").Value;
-                                break;
-                            case "Позиция":
-                                component.pos = e2.Attribute("value").Value;
-                                break;
-                            case "Количество":
-                                component.count = e2.Attribute("value").Value;
-                                break;
-                            }
-                        list.Add(component);
-                        }
+                        component.format = " ";
+                        component.designation = " ";
+                        component.title = " ";
+                        component.note = " ";
+                        component.chapter = elements2.First(item => item.Attribute("name").Value.Equals("Раздел СП")).Attribute("value").Value;
+                        component.pos = " ";
+                        component.count = " ";
                     }
-                    
-                    
+                    else
+                        {
+                        foreach (XElement e2 in elements2)
+                            {
+                                switch (e2.Attribute("name").Value)
+                                {
+                                case "Формат":
+                                    component.format = e2.Attribute("value").Value;
+                                    break;
+                                case "Обозначение":
+                                    component.designation = e2.Attribute("value").Value;
+                                    break;
+                                case "Наименование":
+                                    component.title = e2.Attribute("value").Value;
+                                    break;
+                                case "Примечание":
+                                    component.note = e2.Attribute("value").Value;
+                                    break;
+                                case "Раздел СП":
+                                    component.chapter = e2.Attribute("value").Value;
+                                    break;
+                                case "Позиция":
+                                    component.pos = e2.Attribute("value").Value;
+                                    break;
+                                case "Количество":
+                                    component.count = e2.Attribute("value").Value;
+                                    break;
+                                }
+                            }
+                    }
+                list.Add(component);
                 }
             }
+            
             else
             {
                 foreach (XElement e1 in elements1)
@@ -511,7 +511,6 @@ namespace SWAddin
                     foreach (var v in d.Values) { list.Add(v); }
                 }
             }
-            
             string partition = "Документация";
             int j = 6;
             //MessageBox.Show(list.Count.ToString());
@@ -539,7 +538,7 @@ namespace SWAddin
                         ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
                         pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
                         wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
-                        j = 4;
+                        j = 3;
                     }
 
                     if (j > 33)
@@ -548,7 +547,7 @@ namespace SWAddin
                         ExcelWorksheet excelWorksheet = pck.Workbook.Worksheets.Add("Лист " + (wh1.Index + 1).ToString(), wh1);
                         pck.Workbook.Worksheets.MoveBefore("Лист " + (wh1.Index + 1).ToString(), "ЛРИ");
                         wh = pck.Workbook.Worksheets[pck.Workbook.Worksheets.Count - 2];
-                        j = 4;
+                        j = 3;
                     }
 
                     wh.Cells[j, 4].Value = lr.format;
