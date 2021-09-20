@@ -406,63 +406,112 @@ namespace SWAddin
             {
                 return null;
             }
+
             Record component;
             SortedDictionary<string, Record> dictS;
             dictS = new SortedDictionary<string, Record>();
             List<Record> list;
             list = new List<Record>();
             string key;
-            foreach (XElement e1 in elements1)
-            {
-                component = new Record();
-                component.quantity = 1;
-                elements2 = e1.Element("properties").Elements();
-                foreach (XElement e2 in elements2)
-                {
-                    switch (e2.Attribute("name").Value)
-                    {
-                        case "Формат":
-                            component.format = e2.Attribute("value").Value;
-                            break;
-                        case "Обозначение":
-                            component.designation = e2.Attribute("value").Value;
-                            break;
-                        case "Наименование":
-                            component.title = e2.Attribute("value").Value;
-                            break;
-                        case "Примечание":
-                            component.note = e2.Attribute("value").Value;
-                            break;
-                        case "Раздел СП":
-                            component.chapter = e2.Attribute("value").Value;
-                            break;
-                        case "Позиция":
-                            component.pos = e2.Attribute("value").Value;
-                            break;
-                        case "Количество":
-                            component.count = e2.Attribute("value").Value;
-                            break;
-                    }
-                }
-                key = component.designation + (char)32 + component.title;
-                if (!dictS.ContainsKey(key)) { dictS.Add(key, component); }
-                else dictS[key].quantity++;
-            }
-
-            //Заполнили словарь *******
-            //Сортировка type=="GostDoc"
             if (type == "GostDoc")
             {
-                foreach (var v in dictS.Values) { list.Add(v); } 
+                foreach (XElement e1 in elements1)
+                {
+                    component = new Record();
+                    elements2 = e1.Element("properties").Elements();
+                    foreach (XElement e2 in elements2)
+                    {
+                        if(String.IsNullOrEmpty(e2.Elements().First(item => item.Attribute("name").Value.Equals("Наименование")).Value))
+                        {                                                   
+                                component.format = "";
+                                component.designation = "";
+                                component.title = "";
+                                component.note = "";
+                                component.chapter = "";
+                                component.pos = "";
+                                component.count = "";
+                                list.Add(component);
+                        }
+                        else
+                        {
+                        switch (e2.Attribute("name").Value)
+                            {
+                            case "Формат":
+                                component.format = e2.Attribute("value").Value;
+                                break;
+                            case "Обозначение":
+                                component.designation = e2.Attribute("value").Value;
+                                break;
+                            case "Наименование":
+                                component.title = e2.Attribute("value").Value;
+                                break;
+                            case "Примечание":
+                                component.note = e2.Attribute("value").Value;
+                                break;
+                            case "Раздел СП":
+                                component.chapter = e2.Attribute("value").Value;
+                                break;
+                            case "Позиция":
+                                component.pos = e2.Attribute("value").Value;
+                                break;
+                            case "Количество":
+                                component.count = e2.Attribute("value").Value;
+                                break;
+                            }
+                        list.Add(component);
+                        }
+                    }
+                    
+                    
+                }
             }
-            else 
+            else
             {
+                foreach (XElement e1 in elements1)
+                {
+                    component = new Record();
+                    component.quantity = 1;
+                    elements2 = e1.Element("properties").Elements();
+                    foreach (XElement e2 in elements2)
+                    {
+                        switch (e2.Attribute("name").Value)
+                        {
+                            case "Формат":
+                                component.format = e2.Attribute("value").Value;
+                                break;
+                            case "Обозначение":
+                                component.designation = e2.Attribute("value").Value;
+                                break;
+                            case "Наименование":
+                                component.title = e2.Attribute("value").Value;
+                                break;
+                            case "Примечание":
+                                component.note = e2.Attribute("value").Value;
+                                break;
+                            case "Раздел СП":
+                                component.chapter = e2.Attribute("value").Value;
+                                break;
+                            case "Позиция":
+                                component.pos = e2.Attribute("value").Value;
+                                break;
+                            case "Количество":
+                                component.count = e2.Attribute("value").Value;
+                                break;
+                        }
+                    }
+                    key = component.designation + (char)32 + component.title;
+                    if (!dictS.ContainsKey(key)) { dictS.Add(key, component); }
+                    else dictS[key].quantity++;
+                }
+                //Заполнили словарь *******
+                //Сортировка
                 var dict = dictS.GroupBy(g => g.Value.chapter).OrderBy(n => n.Key, new CustomComparer()).ToDictionary(group => group.Key, group => group.ToDictionary(pair => pair.Key, pair => pair.Value));
                 foreach (var d in dict.Values)
                 {
                     foreach (var v in d.Values) { list.Add(v); }
                 }
             }
+            
             string partition = "Документация";
             int j = 6;
             //MessageBox.Show(list.Count.ToString());
