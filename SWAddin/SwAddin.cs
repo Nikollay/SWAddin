@@ -535,7 +535,7 @@ namespace SWAddin
                 return;
             }
 
-            iSwApp.UnloadAddIn(sAddinName);
+            //iSwApp.UnloadAddIn(sAddinName);
             fileName = swModel.GetPathName();
             doc = new XDocument(new XDeclaration("1.0", "Windows-1251", "Yes"));
             xml = new XElement("xml");
@@ -556,7 +556,7 @@ namespace SWAddin
             {
                 return;
             }
-
+            iSwApp.UnloadAddIn(sAddinName);
             for (int i = 0; i < f.conf.Count; i++)
             {
                 swModel.ShowConfiguration2(f.conf[i]);
