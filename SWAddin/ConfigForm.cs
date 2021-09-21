@@ -14,22 +14,19 @@ namespace SWAddin
             InitializeComponent();
 
 
-
+            Height = 150;
+            Ok.Top = 60;
             CheckBox button;
             for (int i = 1; i < conf_in.Count + 1; i++)
             {
                 button = new CheckBox();
-                Controls.Add(button);
-                this.Height = 175;
-                Ok.Top = 80;
-                Controls.Add(button);
+                Controls.Add(button);            
                 button.Width = 200;
                 button.Height = 20;
                 button.Left = 20;
                 button.Top = i * 10 + (i - 1) * 20;
                 button.Text = conf_in[i - 1];
-
-                this.Height += 20;
+                Height += 20;
                 Ok.Top += 20;
             }
         }
