@@ -544,7 +544,7 @@ namespace SWAddin
             configurations = new XElement("configurations");
             сonfNames = (string[])swModel.GetConfigurationNames();
             conf = new List<string>(сonfNames);
-
+            conf.Sort();
             ConfigForm f = new ConfigForm(conf);
             f.ShowDialog();
             if (f.conf == null)
@@ -557,6 +557,7 @@ namespace SWAddin
                 return;
             }
             iSwApp.UnloadAddIn(sAddinName);
+            f.conf.Sort();
             for (int i = 0; i < f.conf.Count; i++)
             {
                 swModel.ShowConfiguration2(f.conf[i]);
