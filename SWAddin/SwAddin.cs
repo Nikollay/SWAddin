@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Xml.Linq;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Microsoft.Win32;
 
 namespace SWAddin
 {
@@ -34,7 +35,8 @@ namespace SWAddin
         public const int mainItemID2 = 2;
         public const int mainItemID3 = 3;
         public const int mainItemID4 = 4;
-        string sAddinName = "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS PDM\\PDMSW.dll";
+        
+        string sAddinName = GetPDMpath();/*"C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS PDM\\PDMSW.dll";*/
         #endregion
 
         #region SolidWorks Registration
@@ -777,8 +779,35 @@ namespace SWAddin
             wb.Dispose();
             
         }
-        
+
         #endregion
+
+        public static string GetPDMAddInGuid()
+        {
+            const string PDMAddInName = "SOLIDWORKS PDM";
+            var keys = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\SolidWorks\AddIns", false).GetSubKeyNames();
+
+            if (keys != null)
+            {
+                foreach (var key in keys)
+                {
+                    var title = Registry.LocalMachine.OpenSubKey($@"SOFTWARE\SolidWorks\AddIns\{key}").GetValue("Title").ToString();
+
+                    if (title == PDMAddInName)
+                        return key;
+                }
+            }
+
+            return string.Empty;
+
+        }
+        public static string GetPDMpath()
+        {
+            string guid = GetPDMAddInGuid();
+            string path = Registry.ClassesRoot.OpenSubKey($@"CLSID\{guid}\InprocServer32").GetValue(null).ToString();
+            return path;
+        }
+
 
     }
 
