@@ -35,8 +35,7 @@ namespace SWAddin
         public const int mainItemID2 = 2;
         public const int mainItemID3 = 3;
         public const int mainItemID4 = 4;
-        
-        string sAddinName = GetPDMpath();/*"C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS PDM\\PDMSW.dll";*/
+        readonly string sAddinName = GetPDMpath();/*"C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS PDM\\PDMSW.dll";*/
         #endregion
 
         #region SolidWorks Registration
