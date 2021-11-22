@@ -280,6 +280,7 @@ namespace SWAddin
 
             //Эскизы
             swModel.SketchManager.DisplayWhenAdded = false;
+            //Контур
             foreach (object skt in board.sketh)
             {
                 if (skt.GetType().FullName == "SWAddin.Line") { Line sk = (Line)skt; swModel.SketchManager.CreateLine(sk.x1, sk.y1, 0, sk.x2, sk.y2, 0); }
@@ -287,7 +288,7 @@ namespace SWAddin
             }
             swModel.FeatureManager.FeatureExtrusion3(true, false, false, 0, 0, board.thickness, board.thickness, false, false, false, false, 0, 0, false, false, false, false, true, true, true, 0, 0, false);
             swModel.ClearSelection2(true);
-
+            //Вырезы
             if (board.cutout.Count>2)
             {
                 plane.Select2(false, -1);
@@ -301,16 +302,30 @@ namespace SWAddin
                 swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
             }
 
-
-            plane.Select2(false, -1);
-            swModel.SketchManager.InsertSketch(false);
-            swModel.SketchManager.AddToDB = true;
-            
-            foreach (Circle c in board.circles)
+            //Отверстия
+            if (board.circles.Count > 0)
             {
-                swModel.SketchManager.CreateCircleByRadius(c.xc, c.yc, 0, c.radius);
+                plane.Select2(false, -1);
+                swModel.SketchManager.InsertSketch(false);
+                swModel.SketchManager.AddToDB = true;
+
+                foreach (Circle c in board.circles)
+                {
+                    if (c.radius > 1) { swModel.SketchManager.CreateCircleByRadius(c.xc, c.yc, 0, c.radius); }
+                }
+
+                swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
+
+                plane.Select2(false, -1);
+                swModel.SketchManager.InsertSketch(false);
+                swModel.SketchManager.AddToDB = true;
+                foreach (Circle c in board.circles)
+                {
+                    if (c.radius <= 1) { swModel.SketchManager.CreateCircleByRadius(c.xc, c.yc, 0, c.radius); }
+                }
+
+                swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
             }
-            swModel.FeatureManager.FeatureCut4(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
             //swModel.FeatureManager.FeatureCut3(true, false, true, 1, 0, board.thickness, board.thickness, false, false, false, false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false);
 
             swModel.SketchManager.DisplayWhenAdded = true;
