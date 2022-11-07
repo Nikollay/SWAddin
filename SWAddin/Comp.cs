@@ -171,12 +171,12 @@ namespace SWAddin
 
             foreach (Comp k in coll)
             {
-                if (k.chapter != "Сборочные единицы" & k.chapter != "Детали" & k.chapter != "Документация" & k.chapter != "Комплекты")
+                if (k.chapter != "Сборочные единицы" & k.chapter != "Комплексы" & k.chapter != "Детали" & k.chapter != "Документация" & k.chapter != "Комплекты")
                 {
                     k.format = "";
                 }
 
-                if (k.chapter != "Сборочные единицы" & k.chapter != "Детали" & k.chapter != "Документация" & k.chapter != "Комплекты" & k.chapter != "Стандартные изделия")
+                if (k.chapter != "Сборочные единицы" & k.chapter != "Комплексы" & k.chapter != "Детали" & k.chapter != "Документация" & k.chapter != "Комплекты" & k.chapter != "Стандартные изделия")
                 {
                    k.designation = "";
                 }
